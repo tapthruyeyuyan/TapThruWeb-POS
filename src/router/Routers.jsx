@@ -30,12 +30,12 @@ const Routers = () => {
     },
     {
       path: "/pos-mode",
-      auth: false,
+      auth: true,
       component: <POSMode />,
     },
     {
       path: "/order-page",
-      auth: false,
+      auth: true,
       component: <OrderPage />,
     },
     {

@@ -5,6 +5,7 @@ import "./Login.less";
 import { useDispatch, useSelector } from "react-redux";
 import { getStoreInfo } from "../../src/store/storeInfoSlice";
 import { owner } from "../../Mock";
+import { Link } from "react-router-dom";
 
 const Login = () => {
   // 用户名
@@ -85,8 +86,13 @@ const Login = () => {
           </Button>
         </div>
         <Button type='primary' className='content-login' onClick={() => submit()}>
-          Login
+          先点这个初始化判断数据
         </Button>
+        <Link to='/'>
+          <Button type='primary' className='content-login' onClick={() => {}}>
+            在点击这个跳转到home
+          </Button>
+        </Link>
       </div>
     </div>
   );
