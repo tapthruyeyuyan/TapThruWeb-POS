@@ -1,0 +1,44 @@
+@btn-color: #0076fe;
+
+.price {
+  display: flex;
+  justify-content: space-between;
+
+  &-keyboard {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+
+    &-item {
+      border-radius: 10000px;
+      border: 1px solid @btn-color;
+      width: 70px;
+      height: 70px;
+      text-align: center;
+      line-height: 70px;
+    }
+  }
+
+  &-right {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding-left: 20px;
+    font-weight: bold;
+
+    &-title {
+      font-size: 20px;
+      color: @btn-color;
+    }
+
+    &-btn {
+      font-weight: bold;
+      width: 100%;
+      border: 1px solid @btn-color;
+      color: @btn-color;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+    }
+  }
+}

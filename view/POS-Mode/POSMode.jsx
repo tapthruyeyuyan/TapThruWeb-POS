@@ -2,7 +2,24 @@ import { CloseSquareOutlined } from "@ant-design/icons";
 import React, { useEffect } from "react";
 import { useSelector } from "react-redux";
 import "./PSOMode.less";
-import { Rollback, Earth, Pedestrian, DineIn, BagFull, RefuseBin, Map, Car, QRcode, Timer, Landline } from "../../component/Svg/Svg";
+import {
+  Rollback,
+  Earth,
+  Pedestrian,
+  DineIn,
+  BagFull,
+  RefuseBin,
+  Map,
+  Car,
+  QRcode,
+  Timer,
+  Landline,
+  ElectricCar,
+  UserSetting,
+  List,
+  Dollar,
+  Wallet,
+} from "../../component/Svg/Svg";
 import { Link } from "react-router-dom";
 import { Button, Input } from "antd";
 
@@ -55,53 +72,59 @@ const POSMode = () => {
               </div>
               <div>Dine In</div>
             </Button>
-            <Button type='primary' className='home-content-btn'>
-              <div>
-                <BagFull />
-              </div>
-              <div>Pick Up</div>
-            </Button>
+            <Link to={"/infomation"}>
+              <Button type='primary' className='home-content-btn'>
+                <div>
+                  <BagFull />
+                </div>
+                <div>Pick Up</div>
+              </Button>
+            </Link>
           </div>
+
           <div className='home-content'>
-            <Button type='primary' className='home-content-btn'>
-              <div>
-                <Pedestrian />
-              </div>
-              <div>Walk In</div>
-            </Button>
+            <Link to={"/infomation"}>
+              <Button type='primary' className='home-content-btn'>
+                <div>
+                  <ElectricCar />
+                </div>
+                <div>Delivery</div>
+              </Button>
+            </Link>
             <Button type='primary' className='home-content-btn' style={{ margin: "0 20px" }}>
               <div>
-                <DineIn />
+                <UserSetting />
               </div>
-              <div>Dine In</div>
+              <div>Buffet</div>
             </Button>
-            <Button type='primary' className='home-content-btn'>
-              <div>
-                <BagFull />
-              </div>
-              <div>Pick Up</div>
-            </Button>
+            <Link to={"/order-list"}>
+              <Button type='primary' className='home-content-btn'>
+                <div>
+                  <List color={"#fff"} />
+                </div>
+                <div>Order List</div>
+              </Button>
+            </Link>
           </div>
+
           <div className='home-content'>
-            <Button type='primary' className='home-content-btn'>
+            <Button type='primary' className='home-content-btn' style={{ width: "calc((((100% - 40px) / 3) * 2) + 20px)" }}>
               <div>
-                <Pedestrian />
+                <Dollar />
               </div>
-              <div>Walk In</div>
+              <div>Open Drawer</div>
             </Button>
-            <Button type='primary' className='home-content-btn' style={{ margin: "0 20px" }}>
-              <div>
-                <DineIn />
-              </div>
-              <div>Dine In</div>
-            </Button>
-            <Button type='primary' className='home-content-btn'>
-              <div>
-                <BagFull />
-              </div>
-              <div>Pick Up</div>
-            </Button>
+
+            <Link to={"/order-list"}>
+              <Button type='primary' className='home-content-btn' style={{ marginLeft: 20 }}>
+                <div>
+                  <Wallet color={"#FFF"} />
+                </div>
+                <div>Wallet</div>
+              </Button>
+            </Link>
           </div>
+
           <div className='home-box1-btnGroup'>
             <Button type='text' className='home-box1-btn'>
               <Map />

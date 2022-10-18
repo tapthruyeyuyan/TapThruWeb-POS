@@ -1,0 +1,23 @@
+@btn-color: #0076fe;
+
+.keyboardSmall {
+
+    &-input {
+        border: 1px solid @btn-color;
+        border-radius: 8px;
+    }
+
+    &-key {
+        margin-top: 10px;
+        display: flex;
+        justify-content: space-between;
+
+        &-item {
+            border: 1px solid @btn-color;
+            width: calc((100% - 30px) / 3);
+            text-align: center;
+            line-height: 40px;
+            height: 40px;
+        }
+    }
+}

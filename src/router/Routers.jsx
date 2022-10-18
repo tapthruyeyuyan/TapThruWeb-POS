@@ -7,6 +7,9 @@ import Home from "../../view/Home/Home";
 import Login from "../../view/Login/Login";
 import POSMode from "../../view/POS-Mode/POSMode";
 import OrderPage from "../../view/Order/OrderPage";
+import Information from "../../view/Information/Information";
+import OrderList from "../../view/OrderList/OrderList";
+import Payment from "../../view/Payment/Payment";
 
 const Routers = () => {
   const store = useSelector((state) => state.storeInfo);
@@ -37,6 +40,21 @@ const Routers = () => {
       path: "/order-page",
       auth: true,
       component: <OrderPage />,
+    },
+    {
+      path: "/infomation",
+      auth: true,
+      component: <Information />,
+    },
+    {
+      path: "/order-list",
+      auth: true,
+      component: <OrderList />,
+    },
+    {
+      path: "/payment",
+      auth: true,
+      component: <Payment />,
     },
     {
       path: "*",

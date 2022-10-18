@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import "./Home.less";
 import EnterAmount from "../../component/EnterAmount/EnterAmount";
 import { Link } from "react-router-dom";
+import { orders } from "../../Mock";
 
 const Home = () => {
   // 获取商铺信息
@@ -56,6 +57,13 @@ const Home = () => {
   const changeModalTitle = (title) => {
     setModalTitle(title);
   };
+
+  // 选中的列表
+  const [orderList, setOrderList] = useState({});
+
+  useEffect(() => {
+    console.log(orderList);
+  }, [orderList]);
 
   return (
     <>
@@ -144,10 +152,75 @@ const Home = () => {
 
         <div className='order'>
           <div className='order-title'>
-            Found 0 Order(s)
-            <div className='order-list'></div>
+            Found {orders.length} Order(s)
+            <div className='order-list'>
+              {orders.map((item, index) => (
+                <Button
+                  type={orderList === item && "primary"}
+                  key={index.toString()}
+                  className='order-list-item'
+                  onClick={() => {
+                    setOrderList(JSON.parse(JSON.stringify(item)));
+                  }}>
+                  <div className='order-list-item-title'>{item.customer.name}</div>
+                  <div className='order-list-item-type'>
+                    <div>{item.orderType}</div>
+                    <div>#{item.orderId}</div>
+                  </div>
+                  <div className='order-list-item-type'>
+                    <div>{item.customer.phoneNumber}</div>
+                    <div>{item.total.toFixed(2)}</div>
+                  </div>
+                </Button>
+              ))}
+            </div>
           </div>
-          <div className='order-details'>No order selected</div>
+          {JSON.stringify(orderList) === "{}" ? (
+            <div className='order-details'>No order selected</div>
+          ) : (
+            <div className='order-details-item'>
+              <div className='order-details-item-box'>
+                <div className='order-details-item-titleBox'>
+                  <div>{orderList.customer.name}</div>
+                  <div className='order-details-item-box-option'>{orderList.orderType}</div>
+                  <div className='order-details-item-box-option'>{orderList.orderId}</div>
+                </div>
+                <div style={{ fontSize: 20 }}>{`${orderList.orderDateTime.split("T")[0]} ${
+                  orderList.orderDateTime.split("T")[1].split("Z")[0]
+                }`}</div>
+              </div>
+              <div className='order-details-item-box' style={{ marginTop: 10 }}>
+                <div style={{ fontSize: 16 }}>{`(${orderList.customer.phoneNumber.slice(0, 3)})${orderList.customer.phoneNumber.slice(
+                  3,
+                  6
+                )}-${orderList.customer.phoneNumber.slice(6, 10)}`}</div>
+                <div style={{ fontSize: 16 }}>
+                  Payment:<span style={{ fontWeight: "bold" }}>Pre-Paid</span>
+                </div>
+              </div>
+              <div className='order-details-item-comment'>{orderList.specialInstructions}</div>
+              <div className='order-details-item-content'>
+                {orderList.orderItems.map((item, index) => (
+                  <div key={index.toString()} className='order-details-item-content-box'>
+                    <div style={{ width: "20%" }}>{item.quantity}</div>
+                    <div style={{ width: "60%" }}>{item.name}</div>
+                    <div style={{ width: "20%", textAlign: "right" }}>${item.price.toFixed(2)}</div>
+                  </div>
+                ))}
+              </div>
+              <div className='order-details-item-box'>
+                <div>
+                  <div>Subtotal:0.00</div>
+                  <div>Tax:0.00</div>
+                  <div>Tips:0.00</div>
+                </div>
+                <div>
+                  <div>Total</div>
+                  <div>0.00</div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </>
