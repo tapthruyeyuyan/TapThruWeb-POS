@@ -3,10 +3,12 @@ import "./Payment.less";
 import KeyboardSmall from "../../component/Keyborder/KeyboardSmall";
 import { Button, Modal } from "antd";
 import { Close, Discount, Quit, RefuseBin, Tips } from "../../component/Svg/Svg";
+import { useNavigate } from "react-router-dom";
 
 const Payment = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalTitle, setModalTitle] = useState("");
+  const navigate = useNavigate();
 
   return (
     <>
@@ -104,7 +106,12 @@ const Payment = () => {
               <div>Tips</div>
             </Button>
           </div>
-          <Button className='payment-footer-btn' style={{ color: "#FE4A1B", borderColor: "#FE4A1B" }}>
+          <Button
+            className='payment-footer-btn'
+            style={{ color: "#FE4A1B", borderColor: "#FE4A1B" }}
+            onClick={() => {
+              navigate(-1);
+            }}>
             <Quit />
             <div>Quit</div>
           </Button>

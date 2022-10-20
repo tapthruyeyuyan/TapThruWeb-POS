@@ -1,0 +1,33 @@
+@btn-color: #0076fe;
+
+.orderType {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+
+    &-left {
+        display: flex;
+
+        &-btn {
+            border: 1px solid @btn-color;
+            color: @btn-color;
+            margin-left: 16px;
+            border-radius: 8px;
+            height: 100px;
+            width: 100px;
+            font-weight: bold;
+        }
+    }
+
+    &-right {
+        display: flex;
+        flex-direction: column;
+
+        &-btn {
+            margin-top: 16px;
+            border: 1px solid #FE4A1B;
+            color: #FE4A1B;
+        }
+    }
+}

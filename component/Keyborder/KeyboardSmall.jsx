@@ -2,7 +2,7 @@ import { Input } from "antd";
 import React from "react";
 import "./KeyboardSmall.less";
 
-const KeyboardSmall = () => {
+const KeyboardSmall = ({ showInput }) => {
   const keyboard = [
     ["7", "8", "9"],
     ["4", "5", "6"],
@@ -12,7 +12,8 @@ const KeyboardSmall = () => {
 
   return (
     <div className='keyboardSmall'>
-      <Input className='keyboardSmall-input' />
+      {!showInput ? <></> : <Input className='keyboardSmall-input' />}
+
       <div className='keyboardSmall-key'>
         {keyboard[0].map((item, index) => (
           <div key={index.toString()} className='keyboardSmall-key-item'>

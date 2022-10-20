@@ -1,0 +1,41 @@
+@btn-color: #0076fe;
+
+.configure {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+
+    &-box {
+        display: flex;
+        align-items: center;
+    }
+
+    &-big-btn {
+        display: inline-flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid @btn-color;
+        border-radius: 8px;
+        color: @btn-color;
+        width: 200px;
+        height: 100px;
+        font-weight: bold;
+    }
+
+    &-small-btn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid @btn-color;
+        border-radius: 8px;
+        color: @btn-color;
+        width: 100px;
+        height: 100px;
+        font-weight: bold;
+        margin-left: 20px;
+    }
+}

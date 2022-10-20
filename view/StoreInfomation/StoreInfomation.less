@@ -1,0 +1,39 @@
+@btn-color: #0076fe;
+
+.storeInfomation {
+
+    &-list {
+        display: flex;
+        padding: 24px;
+        padding-bottom: 0;
+
+        &-item {
+            display: flex;
+            align-items: center;
+            flex: 1;
+            margin-left: 10px;
+        }
+
+        &-text {
+            font-weight: bold;
+            min-width: 100px;
+        }
+
+        &-input {
+            border: 1px solid #333;
+            border-radius: 8px;
+        }
+
+        &-btn {
+            border: 1px solid @btn-color;
+            flex: 1;
+            border-radius: 8px;
+            color: @btn-color;
+            font-weight: bold;
+        }
+    }
+}
+
+.ant-radio-inner {
+    border-color: #333;
+}

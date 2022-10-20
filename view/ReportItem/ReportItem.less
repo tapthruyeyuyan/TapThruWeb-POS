@@ -1,0 +1,108 @@
+@btn-color: #0076fe;
+
+.peportItem {
+    display: flex;
+    height: 100vh;
+    padding: 24px;
+
+    &-left {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+
+        &-btn {
+            border: 1px solid @btn-color;
+            color: @btn-color;
+            font-weight: bold;
+            margin-left: 16px;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+
+            &-group {
+                display: flex;
+            }
+        }
+
+        &-input {
+            flex: 1;
+
+            &-group {
+                display: flex;
+                margin-top: 16px;
+                font-weight: bold;
+            }
+
+            &-box {
+                display: flex;
+                align-items: center;
+                flex: 1;
+                margin-left: 10px;
+            }
+
+            &-datePicker {
+                border: 1px solid #333;
+                padding: 4px;
+                border-radius: 4px;
+                margin-left: 10px;
+            }
+        }
+
+        &-from {
+            &-box {
+                display: flex;
+                background-color: @btn-color;
+                justify-content: space-around;
+                color: #fff;
+                padding: 10px 0;
+                margin-top: 16px;
+            }
+        }
+
+        &-list {
+            flex: 1;
+            border: 1px solid #333;
+            border-bottom-left-radius: 8px;
+            border-bottom-right-radius: 8px;
+        }
+
+    }
+
+    &-right {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        margin-left: 16px;
+
+        &-btn {
+            display: flex;
+            flex-direction: column;
+            height: auto;
+            align-items: center;
+            border: 1px solid @btn-color;
+            color: @btn-color;
+            border-radius: 4px;
+            font-weight: bold;
+            min-width: 110px;
+            margin-top: 16px;
+
+            &-box {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+            }
+        }
+    }
+}
+
+
+.react-datepicker-wrapper {
+    width: auto !important;
+    flex: 1
+}
+
+.peportItem-left-input-datePicker {
+    width: calc(100% - 10px);
+}

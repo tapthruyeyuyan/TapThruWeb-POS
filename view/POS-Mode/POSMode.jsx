@@ -20,13 +20,15 @@ import {
   Dollar,
   Wallet,
 } from "../../component/Svg/Svg";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button, Input } from "antd";
 
 const POSMode = () => {
   const storeInfo = useSelector((state) => state.storeInfo);
 
   const { TextArea } = Input;
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     console.log(storeInfo);
@@ -91,7 +93,13 @@ const POSMode = () => {
                 <div>Delivery</div>
               </Button>
             </Link>
-            <Button type='primary' className='home-content-btn' style={{ margin: "0 20px" }}>
+            <Button
+              type='primary'
+              className='home-content-btn'
+              style={{ margin: "0 20px" }}
+              onClick={() => {
+                navigate("/table/buffet");
+              }}>
               <div>
                 <UserSetting />
               </div>
@@ -140,7 +148,13 @@ const POSMode = () => {
               <QRcode />
               <div style={{ marginLeft: 10 }}>QR code</div>
             </Button>
-            <Button type='text' className='home-box1-btn' style={{ marginLeft: 10 }}>
+            <Button
+              type='text'
+              className='home-box1-btn'
+              style={{ marginLeft: 10 }}
+              onClick={() => {
+                navigate("/clock-in");
+              }}>
               <Timer />
               <div style={{ marginLeft: 10 }}>Clock In</div>
             </Button>
@@ -215,16 +229,36 @@ const POSMode = () => {
           <Button type='primary'>
             <div>Put away</div>
           </Button>
-          <Button type='primary' className='home-box3-btn'>
+          <Button
+            type='primary'
+            className='home-box3-btn'
+            onClick={() => {
+              navigate("/table/setup");
+            }}>
             <div>Setup Table</div>
           </Button>
-          <Button type='primary' className='home-box3-btn'>
+          <Button
+            type='primary'
+            className='home-box3-btn'
+            onClick={() => {
+              navigate("/configure");
+            }}>
             <div>Configure</div>
           </Button>
-          <Button type='primary' className='home-box3-btn'>
+          <Button
+            type='primary'
+            className='home-box3-btn'
+            onClick={() => {
+              navigate("/setup-pw");
+            }}>
             <div>Setup PW</div>
           </Button>
-          <Button type='primary' className='home-box3-btn'>
+          <Button
+            type='primary'
+            className='home-box3-btn'
+            onClick={() => {
+              navigate("/report");
+            }}>
             <div>Report</div>
           </Button>
         </div>

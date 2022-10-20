@@ -127,7 +127,12 @@ const OrderList = () => {
               <div>Next page</div>
             </Button>
           </div>
-          <Button className='orderList-content-right-btn' style={{ border: "1px solid #FE4A1B", color: "#FE4A1B" }}>
+          <Button
+            className='orderList-content-right-btn'
+            style={{ border: "1px solid #FE4A1B", color: "#FE4A1B" }}
+            onClick={() => {
+              navigate(-1);
+            }}>
             <Quit />
             <div>Quit</div>
           </Button>
