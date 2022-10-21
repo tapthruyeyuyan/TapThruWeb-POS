@@ -45,12 +45,13 @@ const Information = () => {
               <div className='information-header-inputBox-title'>City:</div>
               <Input className='information-header-inputBox-input' />
             </div>
+            {/* <div className='information-header-inputBox-item' style={{ marginLeft: 30 }}></div> */}
             <div className='information-header-inputBox-item' style={{ marginLeft: 30 }}>
-              <div className='information-header-inputBox-title'>State:</div>
+              <div className='information-header-inputBox-title-two'>State:</div>
               <Input className='information-header-inputBox-input' />
-            </div>
-            <div className='information-header-inputBox-item' style={{ marginLeft: 30 }}>
-              <div className='information-header-inputBox-title'>Zip:</div>
+              <div className='information-header-inputBox-title-two' style={{ marginLeft: 10 }}>
+                Zip:
+              </div>
               <Input className='information-header-inputBox-input' />
             </div>
           </div>

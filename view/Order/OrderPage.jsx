@@ -58,7 +58,7 @@ const OrderPage = () => {
             <div className='order-box1-content'>
               <div className='order-content-title'>Category</div>
               <div className='order-content-category'>
-                {dish.map((item, index) => (
+                {/* {dish.map((item, index) => (
                   <Button
                     type='text'
                     className='order-content-category-btn'
@@ -66,7 +66,7 @@ const OrderPage = () => {
                     onClick={() => SetDishs(JSON.parse(JSON.stringify(item)))}>
                     {item.name}
                   </Button>
-                ))}
+                ))} */}
               </div>
             </div>
             <div className='order-box1-content'>

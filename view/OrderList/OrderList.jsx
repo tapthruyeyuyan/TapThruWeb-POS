@@ -28,7 +28,7 @@ const OrderList = () => {
     <div className='orderList'>
       <div className='orderList-content'>
         <div className='orderList-content-left'>
-          <div>
+          <div className='orderList-content-left-box'>
             <Button type='primary' className='orderList-content-left-btn' style={{ marginLeft: 0 }}>
               <Pedestrian />
               <div>Walk In</div>
@@ -55,32 +55,37 @@ const OrderList = () => {
               Select all
             </Button>
           </div>
-          <div style={{ marginTop: 40 }}>
+          <div className='orderList-content-left-box orderList-content-left-box-item'>
             <Button type='primary' className='orderList-content-left-btn' style={{ border: "1px solid #333", background: "none", marginLeft: 0 }}>
               <Printer />
               <div style={{ color: "#0076fe" }}>Print</div>
             </Button>
             <Button type='primary' className='orderList-content-left-btn' style={{ border: "1px solid #333", background: "none" }}>
               <ReprintCredit />
-              <div style={{ color: "#0076fe" }}>Reprint Credit</div>
+              <div style={{ color: "#0076fe" }}>Reprint</div>
+              <div style={{ color: "#0076fe" }}>Credit</div>
             </Button>
             <Button type='primary' className='orderList-content-left-btn' style={{ border: "1px solid #333", background: "none" }}>
               <ReprintCredit />
-              <div style={{ color: "#0076fe" }}>Reprint Checks</div>
+              <div style={{ color: "#0076fe" }}>Reprint</div>
+              <div style={{ color: "#0076fe" }}>Checks</div>
             </Button>
             <Button type='primary' className='orderList-content-left-btn' style={{ border: "1px solid #333", background: "none" }}>
               <UserSetting color={"#0076fe"} />
-              <div style={{ color: "#0076fe" }}>Change Staff</div>
+              <div style={{ color: "#0076fe" }}>Change</div>
+              <div style={{ color: "#0076fe" }}>Staff</div>
             </Button>
           </div>
-          <div style={{ marginTop: 40 }}>
+          <div className='orderList-content-left-box orderList-content-left-box-item'>
             <Button type='primary' className='orderList-content-left-btn' style={{ border: "1px solid #333", background: "none", marginLeft: 0 }}>
               <Split color={"#0076fe"} />
-              <div style={{ color: "#0076fe" }}>Split Order</div>
+              <div style={{ color: "#0076fe" }}>Split</div>
+              <div style={{ color: "#0076fe" }}>Order</div>
             </Button>
             <Button type='primary' className='orderList-content-left-btn' style={{ border: "1px solid #333", background: "none" }}>
               <Close />
-              <div style={{ color: "#0076fe" }}>Cancel Order</div>
+              <div style={{ color: "#0076fe" }}>Cancel</div>
+              <div style={{ color: "#0076fe" }}>Order</div>
             </Button>
             <Button
               type='primary'
@@ -101,15 +106,13 @@ const OrderList = () => {
               <div style={{ color: "#0076fe" }}>Revise</div>
             </Button>
           </div>
-          <div style={{ marginTop: 40 }}>
-            <div className='orderList-content-left-flip'>
-              <Button className='orderList-content-left-flip-btn'>
-                <Up color={"#0076fe"} /> Last Page
-              </Button>
-              <Button className='orderList-content-left-flip-btn' style={{ marginLeft: 20 }}>
-                <Down /> Next Page
-              </Button>
-            </div>
+          <div className='orderList-content-left-flip'>
+            <Button className='orderList-content-left-flip-btn'>
+              <Up color={"#0076fe"} /> Last Page
+            </Button>
+            <Button className='orderList-content-left-flip-btn' style={{ marginLeft: 20 }}>
+              <Down /> Next Page
+            </Button>
           </div>
         </div>
 

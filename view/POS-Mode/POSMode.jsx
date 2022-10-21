@@ -54,12 +54,12 @@ const POSMode = () => {
       </div>
 
       <div className='home-language'>
-        <a style={{ marginRight: 4 }}>English</a> <Earth />
+        <div style={{ marginRight: 4, color: "#0076fe" }}>English</div> <Earth />
       </div>
 
       <div className='home'>
         <div className='home-box1'>
-          <div className='home-content'>
+          <div className='home-content' style={{ marginTop: 0 }}>
             <Link to={"/order-page"}>
               <Button type='primary' className='home-content-btn'>
                 <div>

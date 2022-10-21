@@ -8,10 +8,10 @@ const Notepad = () => {
         <div className='order-box2-header-title' style={{ width: "18%" }}>
           Qty
         </div>
-        <div className='order-box2-header-title' style={{ width: "60%" }}>
+        <div className='order-box2-header-title' style={{ width: "50%" }}>
           item
         </div>
-        <div className='order-box2-header-title' style={{ width: "20%" }}>
+        <div className='order-box2-header-title' style={{ width: "30%" }}>
           Subtotal
         </div>
       </div>

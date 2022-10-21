@@ -16,6 +16,7 @@
   &-content {
     display: flex;
     flex: 1;
+
     &-title {
       font-weight: bold;
       font-size: 20px;
@@ -131,6 +132,10 @@
         border: 1px solid @btn-color;
         border-radius: 8px;
         color: @btn-color;
+        display: inline-flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
       }
     }
   }
@@ -139,12 +144,12 @@
     padding: 24px 24px 24px 0;
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
 
     &-btn {
       height: auto;
       border-radius: 10px;
       padding: 8px 20px;
-      margin-bottom: 10px;
       border: 1px solid @btn-color;
       color: @btn-color;
     }
@@ -208,6 +213,7 @@
         text-align: center;
         color: @btn-color;
       }
+
       flex-wrap: wrap;
     }
 
@@ -296,6 +302,7 @@
     border-radius: 8px;
     margin-top: 20px;
     padding: 0 10px;
+
     &-box {
       display: flex;
       justify-content: space-between;
