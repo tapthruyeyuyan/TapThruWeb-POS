@@ -45,7 +45,7 @@
     flex: 3;
 
     &-content {
-      padding: 24px;
+      padding: 24px 0 24px 24px;
     }
 
     &-bottom {
@@ -333,5 +333,52 @@
       color: @btn-color;
       font-weight: bold;
     }
+  }
+}
+
+.dishList {
+
+  &-header {
+    display: flex;
+    flex: 1;
+    justify-content: space-between;
+    align-items: center;
+
+  }
+
+  &-list {
+    display: flex;
+    justify-content: space-between;
+    padding: 30px 0;
+    border-bottom: 1px solid rgb(231, 231, 231);
+  }
+
+  &-number {
+    border: 1px solid #bdbdbd;
+    width: 40px;
+    height: 40px;
+    margin: 0 10px;
+    border-radius: 8px;
+    line-height: 40px;
+    text-align: center;
+  }
+}
+
+
+.ant-modal-body {
+  max-height: 500px;
+  overflow: auto;
+}
+
+.ant-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+@media (min-height:600px) and (max-height:1200px) {
+  .ant-modal-body {
+
+    max-height: 400px;
   }
 }
