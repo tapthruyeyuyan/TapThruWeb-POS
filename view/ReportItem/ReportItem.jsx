@@ -12,10 +12,6 @@ const ReportItem = () => {
 
   const [startDate, setStartDate] = useState(new Date());
 
-  useEffect(() => {
-    console.log(parmas.id);
-  }, [parmas]);
-
   const [show, setShow] = useState(false);
 
   return (

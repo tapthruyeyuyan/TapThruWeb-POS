@@ -61,10 +61,6 @@ const Home = () => {
   // 选中的列表
   const [orderList, setOrderList] = useState({});
 
-  useEffect(() => {
-    console.log(orderList);
-  }, [orderList]);
-
   return (
     <>
       <EnterAmount isModalOpen={isModalOpen} showModal={showModal} modalTitle={modalTitle} handleOk={handleOk} handleCancel={handleCancel} />

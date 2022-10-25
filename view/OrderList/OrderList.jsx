@@ -18,7 +18,7 @@ import {
   Down,
   Quit,
 } from "../../component/Svg/Svg";
-import Notepad from "../../component/Notepad";
+import Notepad from "../Order/commponent/Notepad";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 

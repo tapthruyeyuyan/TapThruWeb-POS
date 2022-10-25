@@ -30,10 +30,6 @@ const POSMode = () => {
 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    console.log(storeInfo);
-  }, [storeInfo]);
-
   return (
     <div style={{ height: "100vh", display: "flex", flexDirection: "column" }}>
       <div className='header-info home-header'>

@@ -1,5 +1,5 @@
 import React from "react";
-import "../view/Order/OrderPage.less";
+import "../OrderPage.less";
 
 const Notepad = () => {
   return (

@@ -27,15 +27,16 @@ import "./OrderPage.less";
 import ChangePrice from "../../component/Tax/ChangePrice";
 import { useNavigate } from "react-router-dom";
 import Keyboard from "../../component/Keyboard";
-import Notepad from "../../component/Notepad";
+import Notepad from "./commponent/Notepad";
 import { useDispatch, useSelector } from "react-redux";
-import ItemOptions from "./commponent/ItemOptions";
+import OptionsList from "./commponent/OptionsList";
 import { addOrderItems } from "../../src/store/storeInfoSlice";
 
 const { confirm } = Modal;
 
 const OrderPage = () => {
-  const [dishs, SetDishs] = useState({});
+  // 具体的菜品
+  const [dishs, SetDishs] = useState([]);
 
   const [checkText, setCheckText] = useState("");
 
@@ -45,63 +46,90 @@ const OrderPage = () => {
 
   const orderList = useSelector((state) => state.orderList);
 
+  // 获取屏幕宽度
   const windowWidth = document.body.clientWidth;
 
+  // 菜单列表
   const [dishList, setDishList] = useState([]);
+
+  // 大类页数
+  const [pageNumber, setPageNumber] = useState(0);
+
+  // 菜单页数
+  const [dishNumber, setDishNumber] = useState(0);
 
   /**
    * @description: 分页
-   * @param {*} dishListNumber 最多多少个
-   * @param {*} optionsListNumber 最多多少个减少一个
    * @return {*}
    */
-  const paging = (dishListNumber, optionsListNumber) => {
+  const paging = () => {
     let temp = [];
 
-    if (dish.length > dishListNumber) {
-      for (let i = 0; i < dish.length; ) {
-        temp.push(dish.slice(i, (i += optionsListNumber)));
-      }
-
-      for (let i = 0; i < temp.length; i++) {
-        for (let j = 0; j < temp[i].length; j++) {
-          if (temp[i][j].items.length > dishListNumber) {
-            let temp_ = [];
-            for (let o = 0; o < temp[i][j].items.length; ) {
-              temp_.push(temp[i][j].items.slice(o, (o += optionsListNumber)));
-            }
-            // console.log("temp_", temp_);
-            temp[i][j].items = temp_;
-          }
-        }
+    // if (dish.length > pageIndex) {
+    for (let i = 0; i < dish.length; ) {
+      if (i === 0) {
+        temp.push(dish.slice(i, (i += pageIndex - 1)));
+      } else {
+        temp.push(dish.slice(i, (i += pageIndex - 2)));
       }
     }
+
+    if (temp[temp.length - 1].length === 1 && temp.length > 1) {
+      temp[temp.length - 2].push(temp[temp.length - 1][0]);
+      temp.splice(-1, 1);
+    }
+
+    for (let i = 0; i < temp.length; i++) {
+      for (let j = 0; j < temp[i].length; j++) {
+        let temp_ = [];
+        for (let o = 0; o < temp[i][j].items.length; ) {
+          if (o === 0) {
+            temp_.push(temp[i][j].items.slice(o, (o += pageIndex - 1)));
+          } else {
+            temp_.push(temp[i][j].items.slice(o, (o += pageIndex - 2)));
+          }
+        }
+        temp[i][j].items = temp_;
+      }
+    }
+    // }
     setDishList(JSON.parse(JSON.stringify(temp)));
   };
 
+  // 分页数量
+  const [pageIndex, setPageIndex] = useState(0);
+
+  // 按照尺寸进行计算
   useEffect(() => {
     if (windowWidth < 1745 && windowWidth >= 1607) {
-      paging(30, 29);
+      setPageIndex(30);
     } else if (windowWidth < 1606 && windowWidth >= 1468) {
-      paging(27, 26);
+      setPageIndex(27);
     } else if (windowWidth <= 1467 && windowWidth >= 1329) {
-      paging(24, 23);
+      setPageIndex(24);
     } else if (windowWidth <= 1328 && windowWidth >= 1191) {
-      paging(21, 20);
+      setPageIndex(21);
     } else if (windowWidth <= 1190 && windowWidth >= 1069) {
-      paging(18, 17);
+      setPageIndex(18);
     } else if (windowWidth <= 1068 && windowWidth >= 965) {
-      paging(15, 14);
+      setPageIndex(15);
     } else if (windowWidth <= 964 && windowWidth >= 861) {
-      paging(12, 11);
+      setPageIndex(12);
     } else if (windowWidth <= 860 && windowWidth >= 750) {
-      paging(9, 8);
+      setPageIndex(9);
     }
   }, []);
 
+  // 尺寸计算结束执行
   useEffect(() => {
-    console.log(dishList);
-  }, [dishList]);
+    if (pageIndex !== 0) {
+      paging();
+    }
+  }, [pageIndex]);
+
+  // useEffect(() => {
+  //   console.log(dishs);
+  // }, [dishs]);
 
   /**
    * @description: 弹窗显示
@@ -111,391 +139,148 @@ const OrderPage = () => {
 
   // 餐厅模拟数据
   const mock = {
-    restaurantInfoId: 3,
+    restaurantInfoId: 2,
     active: true,
-    id: 1116206,
-    itemId: "0",
-    name: "Create Your Own Combination ",
-    cnName: "Create Your Own Combination ",
-    description: "Choose any two items.",
-    price: 22.95,
+    id: 1687,
+    itemId: "R25",
+    name: " Almond Chicken",
+    cnName: "杏仁鸡",
+    description: null,
+    price: 10.45,
     mPrice: null,
     selectItems: null,
     spicy: false,
     raw: false,
     taxExempt: false,
-    displayOrder: 0,
+    displayOrder: 25,
     itemImage: "https://etapthru.com/img/itemImage.png",
     encodedItemImage: null,
     printerName: "[]",
     printable: true,
     categoryOptionAvailable: true,
-    itemOptionGroups: [
+    itemOptionGroups: [],
+    optionsList: [
       {
-        restaurantInfoId: 3,
-        id: 65176,
-        name: "Choose 2 Items",
-        value: "New Modifier",
-        numOfChoice: 2,
+        restaurantInfoId: 2,
+        id: null,
+        name: "Rice Choice",
+        value: "Choose 1",
+        numOfChoice: 1,
         required: true,
         multiQtyAllowed: true,
-        itemOptions: [
+        groupId: "CategoryOptionGroup_16",
+        optionLocation: "CATEGORY",
+        options: [
           {
-            restaurantInfoId: 3,
-            active: true,
-            id: 252945,
-            name: "Vegetable",
-            cnName: "Vegetable",
+            id: "Option_148",
+            name: "w. White Rice",
+            cnName: "跟白饭",
             price: 0,
-            optionType: null,
-            deleted: false,
-            employee: null,
-            default: false,
+            active: true,
           },
           {
-            restaurantInfoId: 3,
-            active: true,
-            id: 252946,
-            name: " Chicken",
-            cnName: " Chicken",
+            id: "Option_149",
+            name: "w. Fried Rice",
+            cnName: "跟炒饭",
             price: 0,
-            optionType: null,
-            deleted: false,
-            employee: null,
-            default: false,
+            active: true,
           },
           {
-            restaurantInfoId: 3,
+            id: "Option_150",
+            name: "w. Lo Mein",
+            cnName: "跟捞面",
+            price: 1,
             active: true,
-            id: 252947,
-            name: "Shrimp",
-            cnName: "Shrimp",
-            price: 0,
-            optionType: null,
-            deleted: false,
-            employee: null,
-            default: false,
-          },
-          {
-            restaurantInfoId: 3,
-            active: true,
-            id: 252948,
-            name: "Red Snapper",
-            cnName: "Red Snapper",
-            price: 1.5,
-            optionType: null,
-            deleted: false,
-            employee: null,
-            default: false,
-          },
-          {
-            restaurantInfoId: 3,
-            active: true,
-            id: 252949,
-            name: "Calamari",
-            cnName: "Calamari",
-            price: 0,
-            optionType: null,
-            deleted: false,
-            employee: null,
-            default: false,
-          },
-          {
-            restaurantInfoId: 3,
-            active: true,
-            id: 252950,
-            name: " Salmon",
-            cnName: " Salmon",
-            price: 0,
-            optionType: null,
-            deleted: false,
-            employee: null,
-            default: false,
-          },
-          {
-            restaurantInfoId: 3,
-            active: true,
-            id: 252951,
-            name: "Scallop",
-            cnName: "Scallop",
-            price: 2,
-            optionType: null,
-            deleted: false,
-            employee: null,
-            default: false,
-          },
-          {
-            restaurantInfoId: 3,
-            active: true,
-            id: 252952,
-            name: "Lobster (6 oz) ",
-            cnName: "Lobster (6 oz) ",
-            price: 5,
-            optionType: null,
-            deleted: false,
-            employee: null,
-            default: false,
-          },
-          {
-            restaurantInfoId: 3,
-            active: true,
-            id: 252953,
-            name: "New York Steak (Rare)",
-            cnName: "New York Steak (Rare)",
-            price: 2.5,
-            optionType: null,
-            deleted: false,
-            employee: null,
-            default: false,
-          },
-          {
-            restaurantInfoId: 3,
-            active: true,
-            id: 252954,
-            name: "New York Steak (Medium Rare)",
-            cnName: "New York Steak (Medium Rare)",
-            price: 2.5,
-            optionType: null,
-            deleted: false,
-            employee: null,
-            default: false,
-          },
-          {
-            restaurantInfoId: 3,
-            active: true,
-            id: 252955,
-            name: "New York Steak (Medium)",
-            cnName: "New York Steak (Medium)",
-            price: 2.5,
-            optionType: null,
-            deleted: false,
-            employee: null,
-            default: false,
-          },
-          {
-            restaurantInfoId: 3,
-            active: true,
-            id: 252956,
-            name: "New York Steak (Medium Well)",
-            cnName: "New York Steak (Medium Well)",
-            price: 2.5,
-            optionType: null,
-            deleted: false,
-            employee: null,
-            default: false,
-          },
-          {
-            restaurantInfoId: 3,
-            active: true,
-            id: 252957,
-            name: "New York Steak (Well Done)",
-            cnName: "New York Steak (Well Done)",
-            price: 2.5,
-            optionType: null,
-            deleted: false,
-            employee: null,
-            default: false,
-          },
-          {
-            restaurantInfoId: 3,
-            active: true,
-            id: 252958,
-            name: "Filet Mignon (Rare)",
-            cnName: "Filet Mignon (Rare)",
-            price: 4,
-            optionType: null,
-            deleted: false,
-            employee: null,
-            default: false,
-          },
-          {
-            restaurantInfoId: 3,
-            active: true,
-            id: 252959,
-            name: "Filet Mignon (Medium Rare)",
-            cnName: "Filet Mignon (Medium Rare)",
-            price: 4,
-            optionType: null,
-            deleted: false,
-            employee: null,
-            default: false,
-          },
-          {
-            restaurantInfoId: 3,
-            active: true,
-            id: 252960,
-            name: "Filet Mignon (Medium)",
-            cnName: "Filet Mignon (Medium)",
-            price: 4,
-            optionType: null,
-            deleted: false,
-            employee: null,
-            default: false,
-          },
-          {
-            restaurantInfoId: 3,
-            active: true,
-            id: 252961,
-            name: "Filet Mignon (Medium Well)",
-            cnName: "Filet Mignon (Medium Well)",
-            price: 4,
-            optionType: null,
-            deleted: false,
-            employee: null,
-            default: false,
-          },
-          {
-            restaurantInfoId: 3,
-            active: true,
-            id: 252962,
-            name: "Filet Mignon (Well Done)",
-            cnName: "Filet Mignon (Well Done)",
-            price: 4,
-            optionType: null,
-            deleted: false,
-            employee: null,
-            default: false,
           },
         ],
         active: true,
       },
-    ],
-    optionsList: [
       {
-        restaurantInfoId: 3,
+        restaurantInfoId: 2,
         id: null,
-        name: "Choose 2 Items",
-        value: "New Modifier",
+        name: "Side Choice",
+        value: "OPTION_2",
         numOfChoice: 2,
         required: true,
         multiQtyAllowed: true,
-        groupId: "ItemOptionGroup_65176",
-        optionLocation: "ITEM",
+        groupId: "CategoryOptionGroup_17",
+        optionLocation: "CATEGORY",
         options: [
           {
-            id: "ItemOptionGroup_252945",
-            name: "Vegetable",
-            cnName: "Vegetable",
+            id: "Option_151",
+            name: "w. Crab Rangoon",
+            cnName: "跟蟹角",
             price: 0,
             active: true,
           },
           {
-            id: "ItemOptionGroup_252946",
-            name: " Chicken",
-            cnName: " Chicken",
+            id: "Option_153",
+            name: "w. Spring Roll ",
+            cnName: "跟上海春卷",
             price: 0,
             active: true,
           },
           {
-            id: "ItemOptionGroup_252947",
-            name: "Shrimp",
-            cnName: "Shrimp",
-            price: 0,
+            id: "Option_72413",
+            name: "w. Egg Roll",
+            cnName: "跟春卷",
+            price: 0.25,
+            active: true,
+          },
+        ],
+        active: true,
+      },
+      {
+        restaurantInfoId: 2,
+        id: null,
+        name: "Extras",
+        value: "New Modifier",
+        numOfChoice: 0,
+        required: false,
+        multiQtyAllowed: true,
+        groupId: "CategoryOptionGroup_32819",
+        optionLocation: "CATEGORY",
+        options: [
+          {
+            id: "Option_69468",
+            name: "Add Egg",
+            cnName: "加蛋",
+            price: 1,
             active: true,
           },
           {
-            id: "ItemOptionGroup_252948",
-            name: "Red Snapper",
-            cnName: "Red Snapper",
-            price: 1.5,
+            id: "Option_69469",
+            name: "Add Vegetable",
+            cnName: "加菜",
+            price: 1,
             active: true,
           },
           {
-            id: "ItemOptionGroup_252949",
-            name: "Calamari",
-            cnName: "Calamari",
-            price: 0,
-            active: true,
-          },
-          {
-            id: "ItemOptionGroup_252950",
-            name: " Salmon",
-            cnName: " Salmon",
-            price: 0,
-            active: true,
-          },
-          {
-            id: "ItemOptionGroup_252951",
-            name: "Scallop",
-            cnName: "Scallop",
+            id: "Option_69470",
+            name: "Add Chicken",
+            cnName: "加鸡肉",
             price: 2,
             active: true,
           },
           {
-            id: "ItemOptionGroup_252952",
-            name: "Lobster (6 oz) ",
-            cnName: "Lobster (6 oz) ",
-            price: 5,
+            id: "Option_69471",
+            name: "Add Pork",
+            cnName: "加猪肉",
+            price: 2,
             active: true,
           },
           {
-            id: "ItemOptionGroup_252953",
-            name: "New York Steak (Rare)",
-            cnName: "New York Steak (Rare)",
+            id: "Option_69472",
+            name: "Add Beef",
+            cnName: "加牛肉",
             price: 2.5,
             active: true,
           },
           {
-            id: "ItemOptionGroup_252954",
-            name: "New York Steak (Medium Rare)",
-            cnName: "New York Steak (Medium Rare)",
+            id: "Option_69473",
+            name: "Add Shrimp",
+            cnName: "加虾",
             price: 2.5,
-            active: true,
-          },
-          {
-            id: "ItemOptionGroup_252955",
-            name: "New York Steak (Medium)",
-            cnName: "New York Steak (Medium)",
-            price: 2.5,
-            active: true,
-          },
-          {
-            id: "ItemOptionGroup_252956",
-            name: "New York Steak (Medium Well)",
-            cnName: "New York Steak (Medium Well)",
-            price: 2.5,
-            active: true,
-          },
-          {
-            id: "ItemOptionGroup_252957",
-            name: "New York Steak (Well Done)",
-            cnName: "New York Steak (Well Done)",
-            price: 2.5,
-            active: true,
-          },
-          {
-            id: "ItemOptionGroup_252958",
-            name: "Filet Mignon (Rare)",
-            cnName: "Filet Mignon (Rare)",
-            price: 4,
-            active: true,
-          },
-          {
-            id: "ItemOptionGroup_252959",
-            name: "Filet Mignon (Medium Rare)",
-            cnName: "Filet Mignon (Medium Rare)",
-            price: 4,
-            active: true,
-          },
-          {
-            id: "ItemOptionGroup_252960",
-            name: "Filet Mignon (Medium)",
-            cnName: "Filet Mignon (Medium)",
-            price: 4,
-            active: true,
-          },
-          {
-            id: "ItemOptionGroup_252961",
-            name: "Filet Mignon (Medium Well)",
-            cnName: "Filet Mignon (Medium Well)",
-            price: 4,
-            active: true,
-          },
-          {
-            id: "ItemOptionGroup_252962",
-            name: "Filet Mignon (Well Done)",
-            cnName: "Filet Mignon (Well Done)",
-            price: 4,
             active: true,
           },
         ],
@@ -504,20 +289,16 @@ const OrderPage = () => {
     ],
     startTime: null,
     endTime: null,
-    availability: "ALL",
+    availability: "NON_RESTAURANT",
     deleted: false,
-    categoryCnName: "自选套餐",
+    categoryCnName: "全天优惠",
     employee: null,
-    categoryId: 125060,
-    categoryName: "Create Your Own Dinner Combination",
+    categoryId: 38,
+    categoryName: "All Day Combo Special Plates",
   };
 
   // 添加菜品列表
   const [orderListTemp, setOrderListTemp] = useState([]);
-
-  // useEffect(() => {
-  //   console.log(orderListTemp);
-  // }, [orderListTemp]);
 
   /**
    * @description: 提交信息
@@ -561,6 +342,21 @@ const OrderPage = () => {
     setDishShow(false);
   };
 
+  /**
+   * @description: 修改菜单信息
+   * @param {*} item
+   * @return {*}
+   */
+  const changeDishs = (item) => {
+    let temp = item.items;
+    if (JSON.stringify(temp) !== "[]" && temp[temp.length - 1].length === 1 && temp.length > 1) {
+      temp[temp.length - 2].push(temp[temp.length - 1][0]);
+      temp.splice(-1, 1);
+    }
+    SetDishs(JSON.parse(JSON.stringify(temp)));
+    setDishNumber(0);
+  };
+
   return (
     <>
       <DishList
@@ -581,22 +377,56 @@ const OrderPage = () => {
             <div className='order-box1-content'>
               <div className='order-content-title'>Category</div>
               <div className='order-content-category'>
-                {dish.map((item, index) => (
+                {pageNumber > 0 && (
+                  <Button
+                    type='primary'
+                    className='order-content-category-btn'
+                    onClick={() => {
+                      setPageNumber((prve) => (prve -= 1));
+                    }}>
+                    Last Page
+                  </Button>
+                )}
+
+                {dishList[pageNumber]?.map((item, index) => (
                   <Button
                     type='text'
                     className='order-content-category-btn'
                     key={index.toString()}
-                    onClick={() => SetDishs(JSON.parse(JSON.stringify(item)))}>
+                    onClick={() => {
+                      changeDishs(item);
+                    }}>
                     {item.name}
                   </Button>
                 ))}
+                {dishList.length > pageNumber + 1 && (
+                  <Button
+                    type='primary'
+                    className='order-content-category-btn'
+                    onClick={() => {
+                      setPageNumber((prve) => (prve += 1));
+                    }}>
+                    Next Page
+                  </Button>
+                )}
               </div>
             </div>
             <div className='order-box1-content'>
               <div className='order-content-title'>Dishes</div>
               <div className='order-content-category'>
-                {JSON.stringify(dishs) !== "{}" &&
-                  dishs.items.map((item, index) => (
+                {dishNumber > 0 && (
+                  <Button
+                    type='primary'
+                    className='order-content-category-btn'
+                    onClick={() => {
+                      setDishNumber((prve) => (prve -= 1));
+                    }}>
+                    Next Page
+                  </Button>
+                )}
+
+                {JSON.stringify(dishs) !== "[]" &&
+                  dishs[dishNumber].map((item, index) => (
                     <Button
                       type='text'
                       className='order-content-category-btn'
@@ -607,6 +437,17 @@ const OrderPage = () => {
                       {item.name}
                     </Button>
                   ))}
+
+                {dishs.length > dishNumber + 1 && (
+                  <Button
+                    type='primary'
+                    className='order-content-category-btn'
+                    onClick={() => {
+                      setDishNumber((prve) => (prve += 1));
+                    }}>
+                    Next Page
+                  </Button>
+                )}
               </div>
             </div>
             <div className='order-box1-bottom'>
@@ -1007,8 +848,72 @@ const SplitCheck = () => {
 };
 
 const DishList = ({ dishShow, touchOK, touchCancel, mock, orderListTemp, setOrderListTemp }) => {
-  // 选择次数
-  const [selectNumber, setSelectNumber] = useState(0);
+  const [price, setPrice] = useState(mock.price);
+
+  useEffect(() => {
+    console.log(orderListTemp);
+  }, [orderListTemp]);
+
+  const AddOrder = (type, dish) => {
+    let temp = orderListTemp;
+    let bol = false;
+
+    let dishObj = {
+      name: dish.name,
+      cnName: dish.cnName,
+      price: dish.price,
+      groupId: "CategoryOptionGroup_16",
+      categoryCnName: mock.categoryCnName,
+      categoryId: mock.categoryId,
+      categoryName: mock.categoryName,
+      quantity: 1,
+    };
+
+    if (type === "add") {
+      if (JSON.stringify(temp) === "[]") {
+        temp.push(dishObj);
+      } else {
+        for (let i = 0; i < temp.length; i++) {
+          if (temp[i].name === dish.name) {
+            temp[i].quantity++;
+            bol = false;
+            break;
+          } else {
+            bol = true;
+          }
+        }
+
+        if (bol === true) {
+          temp.push(dishObj);
+        }
+      }
+    }
+
+    if (type === "delete") {
+      for (let i = 0; i < temp.length; i++) {
+        if (temp[i].name === dish.name) {
+          temp.splice(i, 1);
+        }
+      }
+    }
+
+    setOrderListTemp(JSON.parse(JSON.stringify(temp)));
+  };
+
+  /**
+   * @description: 修改价格
+   * @param {*} type  增加或者减少
+   * @param {*} price 价格
+   * @return {*}
+   */
+  const changePirce = (type, price) => {
+    if (type === "add") {
+      setPrice((prve) => (prve += price));
+    }
+    if (type === "delete") {
+      setPrice((prve) => (prve -= price));
+    }
+  };
 
   return (
     <Modal
@@ -1028,37 +933,20 @@ const DishList = ({ dishShow, touchOK, touchCancel, mock, orderListTemp, setOrde
           <div className='dishList-number'>1</div>
           <PlusCircleOutlined style={{ fontSize: 20 }} />
         </div>,
-        <Button key='OK' type='primary' onClick={touchOK}>
-          OK
+        <Button key='OK' type='primary' onClick={touchOK} style={{ fontWeight: "bold" }}>
+          ${price.toFixed(2)} - Add to cart
         </Button>,
       ]}>
-      <div className='dishList-header'>
-        <div>
-          <p style={{ fontSize: 16, fontWeight: "bold" }}>Choose {mock.itemOptionGroups[0].numOfChoice} Items</p>
-          <p style={{ fontSize: 14 }}>Select {selectNumber}</p>
-        </div>
-        <div>Required</div>
-      </div>
-      <div>
-        {mock.itemOptionGroups.map((item, index) => (
-          <div key={index.toString()}>
-            {item.itemOptions.map((item_, index_) => (
-              <div key={index_.toString()} className='dishList-list'>
-                <ItemOptions
-                  item={item_}
-                  index={index_}
-                  mock={mock}
-                  orderListTemp={orderListTemp}
-                  setOrderListTemp={setOrderListTemp}
-                  selectNumber={selectNumber}
-                  setSelectNumber={setSelectNumber}
-                  numOfChoice={item.numOfChoice}
-                />
-              </div>
-            ))}
-          </div>
-        ))}
-      </div>
+      {mock.optionsList.map((item, index) => (
+        <OptionsList
+          key={index.toString()}
+          item={item}
+          index={index}
+          AddOrder={AddOrder}
+          orderListTemp={orderListTemp}
+          setOrderListTemp={setOrderListTemp}
+        />
+      ))}
     </Modal>
   );
 };
