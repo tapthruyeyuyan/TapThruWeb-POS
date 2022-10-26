@@ -854,6 +854,12 @@ const DishList = ({ dishShow, touchOK, touchCancel, mock, orderListTemp, setOrde
     console.log(orderListTemp);
   }, [orderListTemp]);
 
+  /**
+   * @description: 修改总菜单
+   * @param {*} type  添加或减少
+   * @param {*} dish  菜品信息
+   * @return {*}
+   */
   const AddOrder = (type, dish) => {
     let temp = orderListTemp;
     let bol = false;
