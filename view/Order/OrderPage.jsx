@@ -30,7 +30,7 @@ import Keyboard from "../../component/Keyboard";
 import Notepad from "./commponent/Notepad";
 import { useDispatch, useSelector } from "react-redux";
 import OptionsList from "./commponent/OptionsList";
-import { addOrderItems } from "../../src/store/storeInfoSlice";
+import { addOrderItems, changeOrderItems } from "../../src/store/storeInfoSlice";
 
 const { confirm } = Modal;
 
@@ -319,7 +319,7 @@ const OrderPage = () => {
     printerName: "[]",
     printable: true,
     mOrderItem: {
-      price: 0,
+      price: mock.price,
     },
     taxExempt: false,
   });
@@ -330,7 +330,25 @@ const OrderPage = () => {
    */
   const touchOK = () => {
     dispatch(addOrderItems({ ...orderInfo, orderItemsOptions: orderListTemp }));
+    setOrderListTemp(JSON.parse(JSON.stringify([])));
     setDishShow(false);
+  };
+
+  /**
+   * @description: 修改大类信息
+   * @param {*} type
+   * @return {*}
+   */
+  const changeOrderInfo = (type) => {
+    let temp = orderInfo;
+    if (type === "add") {
+      temp.quantity += 1;
+    }
+    if (type === "reduce") {
+      temp.quantity -= 1;
+    }
+
+    setOrderInfo(JSON.parse(JSON.stringify(temp)));
   };
 
   /**
@@ -357,6 +375,8 @@ const OrderPage = () => {
     setDishNumber(0);
   };
 
+  const [notepadList, setNotepadList] = useState([0]);
+
   return (
     <>
       <DishList
@@ -366,6 +386,8 @@ const OrderPage = () => {
         touchCancel={touchCancel}
         orderListTemp={orderListTemp}
         setOrderListTemp={setOrderListTemp}
+        changeOrderInfo={changeOrderInfo}
+        orderInfo={orderInfo}
       />
       <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
         <div className='order-header'>
@@ -459,7 +481,7 @@ const OrderPage = () => {
           </div>
 
           <div className='order-box2'>
-            <Notepad />
+            <Notepad orderList={orderList} notepadList={notepadList} setNotepadList={setNotepadList} />
             <div className='order-box2-sort'>
               <Button type='primary' className='order-box2-sort-btn'>
                 <Up />
@@ -472,7 +494,12 @@ const OrderPage = () => {
             </div>
             <div className='order-box2-qty'>
               <Button className='order-box2-qty-item'>Qty</Button>
-              <Button className='order-box2-qty-item' style={{ margin: "0 10px" }}>
+              <Button
+                className='order-box2-qty-item'
+                style={{ margin: "0 10px" }}
+                onClick={() => {
+                  dispatch(changeOrderItems({ type: "reduce", data: notepadList }));
+                }}>
                 <Subtract />
               </Button>
               <Button className='order-box2-qty-item'>
@@ -847,12 +874,12 @@ const SplitCheck = () => {
   });
 };
 
-const DishList = ({ dishShow, touchOK, touchCancel, mock, orderListTemp, setOrderListTemp }) => {
-  const [price, setPrice] = useState(mock.price);
+const DishList = ({ dishShow, touchOK, touchCancel, mock, orderListTemp, setOrderListTemp, changeOrderInfo, orderInfo }) => {
+  const [price, setPrice] = useState(0);
 
-  useEffect(() => {
-    console.log(orderListTemp);
-  }, [orderListTemp]);
+  // useEffect(() => {
+  //   console.log(orderListTemp);
+  // }, [orderListTemp]);
 
   /**
    * @description: 修改总菜单
@@ -897,8 +924,12 @@ const DishList = ({ dishShow, touchOK, touchCancel, mock, orderListTemp, setOrde
 
     if (type === "delete") {
       for (let i = 0; i < temp.length; i++) {
-        if (temp[i].name === dish.name) {
+        if (temp[i].name === dish.name && temp[i].quantity <= 1) {
           temp.splice(i, 1);
+          break;
+        } else if (temp[i].name === dish.name && temp[i].quantity > 1) {
+          temp[i].quantity--;
+          break;
         }
       }
     }
@@ -907,17 +938,50 @@ const DishList = ({ dishShow, touchOK, touchCancel, mock, orderListTemp, setOrde
   };
 
   /**
-   * @description: 修改价格
-   * @param {*} type  增加或者减少
-   * @param {*} price 价格
+   * @description: 计算价格
    * @return {*}
    */
-  const changePirce = (type, price) => {
-    if (type === "add") {
-      setPrice((prve) => (prve += price));
+  useEffect(() => {
+    let temp = mock.price;
+    for (let i = 0; i < orderListTemp.length; i++) {
+      temp += orderListTemp[i].price * orderListTemp[i].quantity;
     }
-    if (type === "delete") {
-      setPrice((prve) => (prve -= price));
+    setPrice(temp);
+  }, [orderListTemp]);
+
+  /**
+   * @description: 未选取列表
+   * @return {*}
+   */
+  const [uncheckedList, setUncheckedList] = useState([]);
+
+  const [unchecked, setUnchecked] = useState(false);
+
+  /**
+   * @description: 点击提交
+   * @return {*}
+   */
+  const submit = () => {
+    if (JSON.stringify(uncheckedList) === "[]") {
+      setUnchecked(false);
+      touchOK();
+    }
+    // style={{ padding: "4px 8px", borderRadius: 4, background: "yellow" }}
+
+    if (JSON.stringify(uncheckedList) !== "[]") {
+      //   uncheckedList.map((item) => {
+      //     window.location.href = `#${item}`;
+      //     let temp = document.getElementsByClassName(`${item}`)[0];
+      //     temp.style.background = "yellow";
+      //   });
+      setUnchecked(true);
+      let temp = uncheckedList[0];
+      for (let i = 0; i < uncheckedList.length; i++) {
+        if (temp > uncheckedList[i]) {
+          temp = uncheckedList[i];
+        }
+      }
+      window.location.hash = `#${temp}`;
     }
   };
 
@@ -935,11 +999,24 @@ const DishList = ({ dishShow, touchOK, touchCancel, mock, orderListTemp, setOrde
       centered
       footer={[
         <div key='dish' style={{ display: "flex", alignItems: "center", marginRight: 10 }}>
-          <MinusCircleOutlined style={{ fontSize: 20 }} />
-          <div className='dishList-number'>1</div>
-          <PlusCircleOutlined style={{ fontSize: 20 }} />
+          <MinusCircleOutlined
+            style={{ fontSize: 20 }}
+            onClick={() => {
+              if (orderInfo.quantity > 1) {
+                changeOrderInfo("reduce");
+              }
+            }}
+          />
+          <div className='dishList-number'>{orderInfo.quantity}</div>
+          <PlusCircleOutlined
+            style={{ fontSize: 20 }}
+            onClick={() => {
+              changeOrderInfo("add");
+            }}
+          />
         </div>,
-        <Button key='OK' type='primary' onClick={touchOK} style={{ fontWeight: "bold" }}>
+        // <Button key='OK' type='primary' onClick={touchOK} style={{ fontWeight: "bold" }}>
+        <Button key='OK' type='primary' onClick={submit} style={{ fontWeight: "bold" }}>
           ${price.toFixed(2)} - Add to cart
         </Button>,
       ]}>
@@ -950,7 +1027,9 @@ const DishList = ({ dishShow, touchOK, touchCancel, mock, orderListTemp, setOrde
           index={index}
           AddOrder={AddOrder}
           orderListTemp={orderListTemp}
-          setOrderListTemp={setOrderListTemp}
+          setUncheckedList={setUncheckedList}
+          uncheckedList={uncheckedList}
+          unchecked={unchecked}
         />
       ))}
     </Modal>

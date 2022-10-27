@@ -2,19 +2,20 @@ import React, { useEffect, useState } from "react";
 import { ExclamationCircleOutlined, MinusCircleOutlined, PlusCircleOutlined } from "@ant-design/icons";
 import "../OrderPage.less";
 
-const OptionsListItem = ({ item, index }) => {
+const OptionsListItem = ({ item, index, numOfChoice, setNumOfChoice, AddOrder, steps, orderListTemp }) => {
   const [dishNumber, setDishNumber] = useState(0);
 
-  // let test = {
-  //   name: item.name,
-  //   cnName: item.cnName,
-  //   price: item.price,
-  //   groupId: "ItemOptionGroup_65176",
-  //   categoryCnName: mock.categoryCnName,
-  //   categoryId: mock.categoryId,
-  //   categoryName: mock.categoryName,
-  //   quantity: 1,
-  // };
+  // useEffect(() => {
+  //   console.log(numOfChoice);
+  // }, [numOfChoice]);
+
+  /**
+   * @description: 提交以后初始化
+   * @return {*}
+   */
+  useEffect(() => {
+    if (JSON.stringify(orderListTemp) == "[]") setDishNumber(0);
+  }, [orderListTemp]);
 
   return (
     <>
@@ -24,46 +25,38 @@ const OptionsListItem = ({ item, index }) => {
         <MinusCircleOutlined
           style={{ fontSize: 20 }}
           onClick={() => {
-            // if (selectNumber > 0 && dishNumber > 0) {
-            //   setDishNumber(dishNumber - 1);
-            //   setSelectNumber(selectNumber - 1);
-            //   let temp = orderListTemp;
-            //   for (let i = 0; i < temp.length; i++) {
-            //     if (temp[i].name === item.name) {
-            //       if (temp[i].quantity > 1) {
-            //         temp[i].quantity -= 1;
-            //       } else {
-            //         temp.splice(i, 1);
-            //       }
-            //     }
-            //   }
-            //   changePirce("delete", item.price);
-            //   setOrderListTemp(JSON.parse(JSON.stringify(temp)));
-            // }
+            if (steps !== 0) {
+              if (dishNumber > 0) {
+                setDishNumber((prve) => (prve -= 1));
+                setNumOfChoice((prve) => (prve += 1));
+                AddOrder("delete", item);
+              }
+            }
+
+            if (steps === 0) {
+              if (dishNumber > 0) {
+                setDishNumber((prve) => (prve -= 1));
+                AddOrder("delete", item);
+              }
+            }
           }}
         />
         <div className='dishList-number'>{dishNumber}</div>
         <PlusCircleOutlined
           style={{ fontSize: 20 }}
           onClick={() => {
-            // if (selectNumber < numOfChoice) {
-            //   setSelectNumber(selectNumber + 1);
-            //   setDishNumber(dishNumber + 1);
-            //   let temp = orderListTemp;
-            //   for (let i = 0; i <= temp.length; i++) {
-            //     if (JSON.stringify(temp) === "[]" || temp[i].name !== item.name) {
-            //       temp.push(test);
-            //       break;
-            //     } else {
-            //       if (temp[i].name === item.name) {
-            //         temp[i].quantity += 1;
-            //         break;
-            //       }
-            //     }
-            //   }
-            //   changePirce("add", item.price);
-            //   setOrderListTemp(JSON.parse(JSON.stringify(temp)));
-            // }
+            if (steps !== 0) {
+              if (numOfChoice > 0) {
+                setDishNumber((prve) => (prve += 1));
+                setNumOfChoice((prve) => (prve -= 1));
+                AddOrder("add", item);
+              }
+            }
+
+            if (steps === 0) {
+              setDishNumber((prve) => (prve += 1));
+              AddOrder("add", item);
+            }
           }}
         />
       </div>

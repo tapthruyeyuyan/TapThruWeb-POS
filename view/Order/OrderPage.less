@@ -92,7 +92,16 @@
 
     &-content {
       border: 1px solid @btn-color;
-      flex: 1;
+      overflow: auto;
+      height: calc((100vh - 48px - 17px - 8px - 145px - 42px - 42px - 67px - 26px));
+
+      &-dish {
+        display: flex;
+        padding: 10px 0;
+        border-bottom: 1px solid #333;
+        justify-content: space-between;
+        text-align: center;
+      }
     }
 
     &-price {
