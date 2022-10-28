@@ -5,16 +5,10 @@ import "../OrderPage.less";
 const OptionsListItem = ({ item, index, numOfChoice, setNumOfChoice, AddOrder, steps, orderListTemp }) => {
   const [dishNumber, setDishNumber] = useState(0);
 
-  // useEffect(() => {
-  //   console.log(numOfChoice);
-  // }, [numOfChoice]);
-
-  /**
-   * @description: 提交以后初始化
-   * @return {*}
-   */
   useEffect(() => {
-    if (JSON.stringify(orderListTemp) == "[]") setDishNumber(0);
+    if (JSON.stringify(orderListTemp) === "[]") {
+      setDishNumber(0);
+    }
   }, [orderListTemp]);
 
   return (

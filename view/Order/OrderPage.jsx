@@ -1,6 +1,6 @@
 import { Button, Popover, Dropdown, Menu, Input, Modal, Calendar } from "antd";
 import { ExclamationCircleOutlined, MinusCircleOutlined, PlusCircleOutlined } from "@ant-design/icons";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { dish } from "../../Mock";
 import {
   Up,
@@ -22,6 +22,10 @@ import {
   CalendarSvg,
   RefuseBin,
   Save,
+  DineIn,
+  BagFull,
+  ElectricCar,
+  UserSetting,
 } from "../../component/Svg/Svg";
 import "./OrderPage.less";
 import ChangePrice from "../../component/Tax/ChangePrice";
@@ -30,7 +34,7 @@ import Keyboard from "../../component/Keyboard";
 import Notepad from "./commponent/Notepad";
 import { useDispatch, useSelector } from "react-redux";
 import OptionsList from "./commponent/OptionsList";
-import { addOrderItems, changeOrderItems } from "../../src/store/storeInfoSlice";
+import { addOrderItems, changeOrderItems, changeOrderType } from "../../src/store/storeInfoSlice";
 
 const { confirm } = Modal;
 
@@ -99,25 +103,33 @@ const OrderPage = () => {
   // 分页数量
   const [pageIndex, setPageIndex] = useState(0);
 
+  const category = useRef(null);
+
   // 按照尺寸进行计算
   useEffect(() => {
-    if (windowWidth < 1745 && windowWidth >= 1607) {
-      setPageIndex(30);
-    } else if (windowWidth < 1606 && windowWidth >= 1468) {
-      setPageIndex(27);
-    } else if (windowWidth <= 1467 && windowWidth >= 1329) {
-      setPageIndex(24);
-    } else if (windowWidth <= 1328 && windowWidth >= 1191) {
-      setPageIndex(21);
-    } else if (windowWidth <= 1190 && windowWidth >= 1069) {
-      setPageIndex(18);
-    } else if (windowWidth <= 1068 && windowWidth >= 965) {
-      setPageIndex(15);
-    } else if (windowWidth <= 964 && windowWidth >= 861) {
-      setPageIndex(12);
-    } else if (windowWidth <= 860 && windowWidth >= 750) {
-      setPageIndex(9);
-    }
+    // if (windowWidth < 1745 && windowWidth >= 1607) {
+    //   setPageIndex(30);
+    // } else if (windowWidth < 1606 && windowWidth >= 1468) {
+    //   setPageIndex(27);
+    // } else if (windowWidth <= 1467 && windowWidth >= 1329) {
+    //   setPageIndex(24);
+    // } else if (windowWidth <= 1328 && windowWidth >= 1191) {
+    //   setPageIndex(21);
+    // } else if (windowWidth <= 1190 && windowWidth >= 1069) {
+    //   setPageIndex(18);
+    // } else if (windowWidth <= 1068 && windowWidth >= 965) {
+    //   setPageIndex(15);
+    // } else if (windowWidth <= 964 && windowWidth >= 861) {
+    //   setPageIndex(12);
+    // } else if (windowWidth <= 860 && windowWidth >= 750) {
+    //   setPageIndex(9);
+    // }
+    setPageIndex(
+      Math.floor((category.current.offsetWidth / 110) * 3) % 3 !== 0
+        ? Math.floor((category.current.offsetWidth / 110) * 3) + (3 - (Math.floor((category.current.offsetWidth / 110) * 3) % 3))
+        : Math.floor((category.current.offsetWidth / 110) * 3)
+    );
+    console.log((category.current.offsetWidth / 110) * 3);
   }, []);
 
   // 尺寸计算结束执行
@@ -375,7 +387,47 @@ const OrderPage = () => {
     setDishNumber(0);
   };
 
+  /**
+   * @description: 当前选中
+   * @return {*}
+   */
   const [notepadList, setNotepadList] = useState([0]);
+
+  /**
+   * @description: orderTypeShow 显示隐藏
+   * @return {*}
+   */
+  const [orderTypeShow, setOrderTypeShow] = useState(false);
+
+  /**
+   * @description: setTime 显示隐藏
+   * @return {*}
+   */
+  const [setTimeShow, setSetTimeShow] = useState(false);
+
+  /**
+   * @description: selfInput 显示隐藏
+   * @return {*}
+   */
+  const [selfInputShow, setSelfInputShow] = useState(false);
+
+  /**
+   * @description: discount 显示隐藏
+   * @return {*}
+   */
+  const [discountShow, setDiscountShow] = useState(false);
+
+  /**
+   * @description: tips 显示隐藏
+   * @return {*}
+   */
+  const [tipsShow, setTipsShow] = useState(false);
+
+  /**
+   * @description: qty 显示隐藏
+   * @return {*}
+   */
+  const [qty, setQty] = useState(false);
 
   return (
     <>
@@ -398,7 +450,7 @@ const OrderPage = () => {
           <div className='order-box1'>
             <div className='order-box1-content'>
               <div className='order-content-title'>Category</div>
-              <div className='order-content-category'>
+              <div className='order-content-category' ref={category}>
                 {pageNumber > 0 && (
                   <Button
                     type='primary'
@@ -493,16 +545,27 @@ const OrderPage = () => {
               </Button>
             </div>
             <div className='order-box2-qty'>
-              <Button className='order-box2-qty-item'>Qty</Button>
+              <Popover
+                placement='leftBottom'
+                content={<ChangePrice type={"qty"} notepadList={notepadList} quit={setQty} />}
+                trigger='click'
+                open={qty}
+                onOpenChange={() => setQty((prev) => !prev)}>
+                <Button className='order-box2-qty-item'>Qty</Button>
+              </Popover>
               <Button
                 className='order-box2-qty-item'
                 style={{ margin: "0 10px" }}
                 onClick={() => {
-                  dispatch(changeOrderItems({ type: "reduce", data: notepadList }));
+                  dispatch(changeOrderItems({ type: "reduce", data: notepadList, quantity: 1 }));
                 }}>
                 <Subtract />
               </Button>
-              <Button className='order-box2-qty-item'>
+              <Button
+                className='order-box2-qty-item'
+                onClick={() => {
+                  dispatch(changeOrderItems({ type: "add", data: notepadList, quantity: 1 }));
+                }}>
                 <Add />
               </Button>
             </div>
@@ -531,7 +594,12 @@ const OrderPage = () => {
               <Quit />
               <div style={{ color: "#FE4A1B" }}>Quit</div>
             </Button>
-            <Popover placement='leftTop' content={<OrderType />} trigger='click'>
+            <Popover
+              placement='leftTop'
+              content={<OrderType />}
+              trigger='click'
+              open={orderTypeShow}
+              onOpenChange={() => setOrderTypeShow((prev) => !prev)}>
               <Button
                 className='order-box3-btn'
                 onClick={() => {
@@ -542,7 +610,12 @@ const OrderPage = () => {
                 <div style={{ color: checkText === "Order Type" ? "#FFF" : "#0076fe" }}>Order Type</div>
               </Button>
             </Popover>
-            <Popover placement='leftTop' content={<SetTime />} trigger='click'>
+            <Popover
+              placement='left'
+              content={<SetTime setSetTimeShow={setSetTimeShow} />}
+              trigger='click'
+              open={setTimeShow}
+              onOpenChange={() => setSetTimeShow((prev) => !prev)}>
               <Button
                 className='order-box3-btn'
                 onClick={() => {
@@ -562,7 +635,12 @@ const OrderPage = () => {
               {checkText === "Set price" ? <Price color={"#fff"} /> : <Price color={"#0076fe"} />}
               <div style={{ color: checkText === "Set price" ? "#FFF" : "#0076fe" }}>Set price</div>
             </Button>
-            <Popover placement='left' content={<SelfInput />} trigger='click'>
+            <Popover
+              placement='left'
+              content={<SelfInput setSelfInputShow={setSelfInputShow} />}
+              trigger='click'
+              open={selfInputShow}
+              onOpenChange={() => setSelfInputShow((prev) => !prev)}>
               <Button
                 className='order-box3-btn'
                 onClick={() => {
@@ -583,7 +661,12 @@ const OrderPage = () => {
               {checkText === "Split Check" ? <Split color={"#fff"} /> : <Split color={"#0076fe"} />}
               <div style={{ color: checkText === "Split Check" ? "#FFF" : "#0076fe" }}>Split Check</div>
             </Button>
-            <Popover placement='leftBottom' content={<ChangePrice />} trigger='click'>
+            <Popover
+              placement='leftBottom'
+              content={<ChangePrice type={"discount"} quit={setDiscountShow} />}
+              trigger='click'
+              open={discountShow}
+              onOpenChange={() => setDiscountShow((prev) => !prev)}>
               <Button
                 className='order-box3-btn'
                 onClick={() => {
@@ -594,7 +677,12 @@ const OrderPage = () => {
                 <div style={{ color: checkText === "Discount" ? "#FFF" : "#0076fe" }}>Discount</div>
               </Button>
             </Popover>
-            <Popover placement='leftBottom' content={<ChangePrice />} trigger='click'>
+            <Popover
+              placement='leftBottom'
+              content={<ChangePrice type={"tips"} quit={setTipsShow} />}
+              trigger='click'
+              open={tipsShow}
+              onOpenChange={() => setTipsShow((prev) => !prev)}>
               <Button
                 className='order-box3-btn'
                 onClick={() => {
@@ -617,30 +705,52 @@ const OrderPage = () => {
  * @return {*}
  */
 const OrderType = () => {
+  const dispatch = useDispatch();
+  const orderType = useSelector((state) => state.orderList.orderType);
+
+  useEffect(() => {
+    console.log(orderType);
+  }, [orderType]);
+
   return (
     <div style={{ padding: 20 }}>
       <div>
-        <Button className='orderType-btn' onClick={() => {}}>
-          <Pedestrian color={"#0076fe"} />
+        <Button
+          className='orderType-btn'
+          onClick={() => {
+            dispatch(changeOrderType("Walk In"));
+          }}
+          style={{ background: orderType === "Walk In" ? "#0076fe" : "#FFF", color: orderType === "Walk In" ? "#fff" : "#0076fe" }}>
+          <Pedestrian color={orderType === "Walk In" ? "#fff" : "#0076fe"} />
           <div>Walk In</div>
         </Button>
         <Button className='orderType-btn' style={{ margin: "0 10px" }} onClick={() => {}}>
-          <Pedestrian color={"#0076fe"} />
-          <div>Walk In</div>
+          <DineIn color={"#0076fe"} />
+          <div>Dine In</div>
         </Button>
-        <Button className='orderType-btn' onClick={() => {}}>
-          <Pedestrian color={"#0076fe"} />
-          <div>Walk In</div>
+        <Button
+          className='orderType-btn'
+          onClick={() => {
+            dispatch(changeOrderType("Pick Up"));
+          }}
+          style={{ background: orderType === "Pick Up" ? "#0076fe" : "#FFF", color: orderType === "Pick Up" ? "#fff" : "#0076fe" }}>
+          <BagFull color={orderType === "Pick Up" ? "#fff" : "#0076fe"} />
+          <div>Pick Up</div>
         </Button>
       </div>
       <div style={{ marginTop: 10 }}>
-        <Button className='orderType-btn' style={{ marginRight: 10 }} onClick={() => {}}>
-          <Pedestrian color={"#0076fe"} />
-          <div>Walk In</div>
+        <Button
+          className='orderType-btn'
+          style={{ marginRight: 10, background: orderType === "Delivery" ? "#0076fe" : "#FFF", color: orderType === "Delivery" ? "#fff" : "#0076fe" }}
+          onClick={() => {
+            dispatch(changeOrderType("Delivery"));
+          }}>
+          <ElectricCar color={orderType === "Delivery" ? "#fff" : "#0076fe"} />
+          <div>Delivery</div>
         </Button>
         <Button className='orderType-btn' onClick={() => {}}>
-          <Pedestrian color={"#0076fe"} />
-          <div>Walk In</div>
+          <UserSetting color={"#0076fe"} />
+          <div>Buffet</div>
         </Button>
       </div>
     </div>
@@ -696,7 +806,7 @@ const week = [
  * @description: 日历切换
  * @return {*}
  */
-const SetTime = () => {
+const SetTime = ({ setSetTimeShow }) => {
   const onPanelChange = (value, mode) => {
     console.log(value.format("YYYY-MM-DD"), mode);
   };
@@ -721,23 +831,7 @@ const SetTime = () => {
         </div>
       </div>
       <div className='setTime-calendar'>
-        {/* <div className='setTime-calendar-week'>
-          <div className='setTime-calendar-week-item'>Sun</div>
-          <div className='setTime-calendar-week-item'>Mon</div>
-          <div className='setTime-calendar-week-item'>Tue</div>
-          <div className='setTime-calendar-week-item'>Wed</div>
-          <div className='setTime-calendar-week-item'>Thur</div>
-          <div className='setTime-calendar-week-item'>Fri</div>
-          <div className='setTime-calendar-week-item'>Sat</div>
-        </div>
-        <div className='setTime-calendar-day'>
-          {week.map((item, index) => (
-            <div key={index.toString()} className='setTime-calendar-day-item'>
-              {item}
-            </div>
-          ))}
-        </div> */}
-        <Calendar fullscreen={false} onPanelChange={onPanelChange} style={{ width: 700 }} />
+        <Calendar fullscreen={false} onPanelChange={onPanelChange} style={{ width: 450 }} />
         <div className='setTime-calendar-btn'>
           <div className='setTime-calendar-btn'>
             <Button className='setTime-calendar-btn-item'>
@@ -754,7 +848,10 @@ const SetTime = () => {
               <Save />
               <div style={{ marginLeft: 8 }}>Save</div>
             </Button>
-            <Button className='setTime-calendar-btn-item' style={{ marginLeft: 10, border: "1px solid #FE4A1B", color: "#FE4A1B" }}>
+            <Button
+              className='setTime-calendar-btn-item'
+              style={{ marginLeft: 10, border: "1px solid #FE4A1B", color: "#FE4A1B" }}
+              onClick={() => setSetTimeShow((prev) => !prev)}>
               <Quit />
               <div style={{ marginLeft: 8 }}>退出</div>
             </Button>
@@ -790,32 +887,83 @@ const SetTimeHour = () => {
  * @description: SelfInput
  * @return {*}
  */
-const SelfInput = () => {
+const SelfInput = ({ setSelfInputShow }) => {
+  const [name, setName] = useState("");
+  const [price, setPrice] = useState("");
+  const [quantitly, setQuantitly] = useState("");
+
+  const [distinguish, setDistinguish] = useState("name");
+
   return (
     <div className='selfInput'>
       <div className='selfInput-content'>
         <div className='selfInput-content-left'>
           <div className='selfInput-content-left-item'>
             <div style={{ minWidth: 70 }}>Name:</div>
-            <Input className='selfInput-content-left-item-input' />
+            <Input
+              className='selfInput-content-left-item-input'
+              value={name}
+              onClick={() => {
+                setDistinguish("name");
+              }}
+              style={{ borderColor: distinguish === "name" ? "#0076fe" : "#333" }}
+            />
           </div>
           <div className='selfInput-content-left-item'>
             <div style={{ minWidth: 70 }}>Price:</div>
-            <Input className='selfInput-content-left-item-input' />
-            <Button type='primary' className='selfInput-content-left-item-btn'>
+            <Input
+              className='selfInput-content-left-item-input'
+              value={price}
+              onClick={() => {
+                setDistinguish("price");
+              }}
+              style={{ borderColor: distinguish === "price" ? "#0076fe" : "#333" }}
+            />
+            <Button
+              type='primary'
+              className='selfInput-content-left-item-btn'
+              onClick={() => {
+                setPrice((prev) => (prev += 3));
+                setDistinguish("price");
+              }}>
               3.00
             </Button>
-            <Button type='primary' className='selfInput-content-left-item-btn'>
+            <Button
+              type='primary'
+              className='selfInput-content-left-item-btn'
+              onClick={() => {
+                setPrice((prev) => (prev += 4));
+                setDistinguish("price");
+              }}>
               4.00
             </Button>
           </div>
           <div className='selfInput-content-left-item'>
             <div style={{ minWidth: 70 }}>Quantitly:</div>
-            <Input className='selfInput-content-left-item-input' />
-            <Button type='primary' className='selfInput-content-left-item-btn'>
+            <Input
+              className='selfInput-content-left-item-input'
+              value={quantitly}
+              onClick={() => {
+                setDistinguish("quantitly");
+              }}
+              style={{ borderColor: distinguish === "quantitly" ? "#0076fe" : "#333" }}
+            />
+            <Button
+              type='primary'
+              className='selfInput-content-left-item-btn'
+              onClick={() => {
+                setQuantitly((prev) => (prev += 3));
+                setDistinguish("quantitly");
+              }}>
               3.00
             </Button>
-            <Button type='primary' className='selfInput-content-left-item-btn'>
+            <Button
+              type='primary'
+              className='selfInput-content-left-item-btn'
+              onClick={() => {
+                setQuantitly((prev) => (prev += 4));
+                setDistinguish("quantitly");
+              }}>
               4.00
             </Button>
           </div>
@@ -842,13 +990,18 @@ const SelfInput = () => {
           </div>
         </div>
       </div>
-      <Keyboard />
+      <Keyboard changeText={distinguish === "name" ? setName : distinguish === "price" ? setPrice : setQuantitly} />
       <div className='selfInput-btn'>
         <Button className='selfInput-btn-item'>
           <Save />
           Save
         </Button>
-        <Button className='selfInput-btn-item' style={{ border: "1px solid #FE4A1B", color: "#FE4A1B", marginLeft: 10 }}>
+        <Button
+          className='selfInput-btn-item'
+          style={{ border: "1px solid #FE4A1B", color: "#FE4A1B", marginLeft: 10 }}
+          onClick={() => {
+            setSelfInputShow((prev) => !prev);
+          }}>
           <Quit />
           Quit
         </Button>

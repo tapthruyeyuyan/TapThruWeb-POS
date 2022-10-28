@@ -2,9 +2,19 @@ import React, { useEffect, useState } from "react";
 import "../OrderPage.less";
 
 const Notepad = ({ orderList, notepadList, setNotepadList }) => {
-  // useEffect(() => {
-  //   console.log(orderList.orderItems);
-  // }, [orderList]);
+  useEffect(() => {
+    let temp = 0;
+    for (let i = 0; i < orderList.orderItems.length; i++) {
+      temp += orderList.orderItems[i].price * orderList.orderItems[i].quantity;
+
+      for (let j = 0; j < orderList.orderItems[i].orderItemsOptions.length; j++) {
+        temp += orderList.orderItems[i].orderItemsOptions[j].price * orderList.orderItems[i].orderItemsOptions[j].quantity;
+      }
+    }
+    setSubtotal(temp);
+  }, [orderList]);
+
+  const [subtotal, setSubtotal] = useState(0);
 
   return (
     <>
@@ -60,23 +70,23 @@ const Notepad = ({ orderList, notepadList, setNotepadList }) => {
       <div className='order-box2-price'>
         <div className='order-box2-price-item'>
           <div>Subtotal:</div>
-          <div>$0</div>
+          <div>${subtotal.toFixed(2)}</div>
         </div>
         <div className='order-box2-price-item'>
           <div>Tax:</div>
-          <div>$0.00</div>
+          <div>${(subtotal * 0.08).toFixed(2)}</div>
         </div>
         <div className='order-box2-price-item'>
           <div>Discount:</div>
-          <div>$0.00</div>
+          <div>${(subtotal * orderList.discount - subtotal).toFixed(2)}</div>
         </div>
         <div className='order-box2-price-item'>
           <div>Tips:</div>
-          <div>$0.00</div>
+          <div>${orderList.tips.toFixed(2)}</div>
         </div>
         <div className='order-box2-price-item'>
           <div>Total:</div>
-          <div>$0.00</div>
+          <div>${(subtotal + subtotal * 0.08 + orderList.tips + (subtotal * orderList.discount - subtotal)).toFixed(2)}</div>
         </div>
       </div>
     </>

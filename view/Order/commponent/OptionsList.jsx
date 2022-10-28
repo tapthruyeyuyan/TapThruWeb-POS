@@ -7,6 +7,13 @@ const OptionsList = ({ item, index, AddOrder, orderListTemp, setUncheckedList, u
   const [numOfChoice, setNumOfChoice] = useState(item.numOfChoice);
   const [steps, setSteps] = useState(item.numOfChoice);
 
+  useEffect(() => {
+    if (JSON.stringify(orderListTemp) === "[]") {
+      setNumOfChoice(item.numOfChoice);
+      setValue("");
+    }
+  }, [orderListTemp]);
+
   /**
    * @description: 判断是否必选都选完了
    * @return {*}
@@ -39,14 +46,6 @@ const OptionsList = ({ item, index, AddOrder, orderListTemp, setUncheckedList, u
    * @return {*}
    */
   const [value, setValue] = useState("");
-
-  /**
-   * @description: 提交之后初始化
-   * @return {*}
-   */
-  useEffect(() => {
-    if (JSON.stringify(orderListTemp) === "[]") setValue("");
-  }, [orderListTemp]);
 
   /**
    * @description: 点击radio改变值
@@ -87,6 +86,10 @@ const OptionsList = ({ item, index, AddOrder, orderListTemp, setUncheckedList, u
     }
   };
 
+  /**
+   * @description: 未选择的背景颜色
+   * @return {*}
+   */
   const [background, setBackGround] = useState(false);
 
   useEffect(() => {
