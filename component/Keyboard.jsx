@@ -39,56 +39,66 @@ const Keyboard = ({ changeText }) => {
   };
 
   return (
-    <div className='selfInput-keyboard'>
-      <div className='selfInput-keyboard-box'>
+    <div className="selfInput-keyboard">
+      <div className="selfInput-keyboard-box">
         {keyboard[0].map((item, index) => (
           <Button
-            className='selfInput-keyboard-box-item'
+            className="selfInput-keyboard-box-item"
             key={index.toString()}
             onClick={() => {
               changeText((prev) => (prev += item));
-            }}>
+            }}
+          >
             {item}
           </Button>
         ))}
       </div>
-      <div className='selfInput-keyboard-box'>
+      <div className="selfInput-keyboard-box">
         {keyboard[1].map((item, index) => (
           <Button
-            className='selfInput-keyboard-box-item'
+            className="selfInput-keyboard-box-item"
             key={index.toString()}
             onClick={() => {
               changeText((prev) => (prev += item));
-            }}>
+            }}
+          >
             {item}
           </Button>
         ))}
       </div>
-      <div className='selfInput-keyboard-box'>
+      <div className="selfInput-keyboard-box">
         {keyboard[2].map((item, index) => (
           <Button
-            className='selfInput-keyboard-box-item'
+            className="selfInput-keyboard-box-item"
             key={index.toString()}
             onClick={() => {
               changeText((prev) => (prev += item));
-            }}>
+            }}
+          >
             {item}
           </Button>
         ))}
       </div>
 
-      <div className='selfInput-keyboard-box' style={{ paddingBottom: 10 }}>
+      <div className="selfInput-keyboard-box" style={{ paddingBottom: 10 }}>
         <Button
-          className='selfInput-keyboard-box-item'
-          style={{ width: "calc(calc(calc(calc(100% - 130px) / 13) * 6) + 54px)" }}
+          className="selfInput-keyboard-box-item"
+          style={{
+            width: "calc(calc(calc(calc(100% - 130px) / 13) * 6) + 54px)",
+          }}
           onClick={() => {
             changeText((prev) => (prev += " "));
-          }}>
+          }}
+        >
           Space
         </Button>
         <Button
-          className='selfInput-keyboard-box-item'
-          style={{ display: "inline-flex", alignItems: "center", justifyContent: "center" }}
+          className="selfInput-keyboard-box-item"
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
           onMouseDown={() => {
             mouseDown();
           }}
@@ -105,39 +115,44 @@ const Keyboard = ({ changeText }) => {
                 }
               });
             }
-          }}>
+          }}
+        >
           <Delete />
         </Button>
         <Button
-          className='selfInput-keyboard-box-item'
+          className="selfInput-keyboard-box-item"
           onClick={() => {
             changeText((prev) => (prev += ":"));
-          }}>
+          }}
+        >
           :
         </Button>
         <Button
-          className='selfInput-keyboard-box-item'
+          className="selfInput-keyboard-box-item"
           onClick={() => {
             changeText((prev) => (prev += "/"));
-          }}>
+          }}
+        >
           /
         </Button>
         <Button
-          className='selfInput-keyboard-box-item'
+          className="selfInput-keyboard-box-item"
           onClick={() => {
             changeText((prev) => (prev += '"'));
-          }}>
+          }}
+        >
           "
         </Button>
         <Button
-          className='selfInput-keyboard-box-item'
+          className="selfInput-keyboard-box-item"
           style={{ width: "calc(calc(calc(100% - 130px) / 13) * 2 + 10px)" }}
           onClick={() => {
             changeText((prev) => (prev += "0"));
-          }}>
+          }}
+        >
           0
         </Button>
-        <Button className='selfInput-keyboard-box-item'>Enter</Button>
+        <Button className="selfInput-keyboard-box-item">Enter</Button>
       </div>
     </div>
   );

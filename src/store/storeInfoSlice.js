@@ -7,8 +7,47 @@ const initialState = {
     setTime: "",
     orderItems: [],
     tips: 0,
-    discount: 0,
+    discount: 1,
   },
+  infomation: [],
+  table: [
+    {
+      id: "001",
+      groupName: "Group A",
+      groupItem: [
+        {
+          id: "001-01",
+          name: "A1",
+          x: 50,
+          y: 100,
+        },
+        {
+          id: "001-02",
+          name: "A2",
+          x: 0,
+          y: 10,
+        },
+      ],
+    },
+    {
+      id: "002",
+      groupName: "Group B",
+      groupItem: [
+        {
+          id: "002-01",
+          name: "B1",
+          x: 50,
+          y: 100,
+        },
+        {
+          id: "002-02",
+          name: "B2",
+          x: 0,
+          y: 10,
+        },
+      ],
+    },
+  ],
 };
 
 export const storeInfo = createSlice({
@@ -49,10 +88,21 @@ export const storeInfo = createSlice({
         }
 
         if (data.length === 2) {
-          if (state.orderList.orderItems[data[0]].orderItemsOptions[data[1]].quantity <= quantity) {
-            state.orderList.orderItems[data[0]].orderItemsOptions.splice(data[1], 1);
-          } else if (state.orderList.orderItems[data[0]].orderItemsOptions[data[1]].quantity > quantity) {
-            state.orderList.orderItems[data[0]].orderItemsOptions[data[1]].quantity -= quantity;
+          if (
+            state.orderList.orderItems[data[0]].orderItemsOptions[data[1]]
+              .quantity <= quantity
+          ) {
+            state.orderList.orderItems[data[0]].orderItemsOptions.splice(
+              data[1],
+              1
+            );
+          } else if (
+            state.orderList.orderItems[data[0]].orderItemsOptions[data[1]]
+              .quantity > quantity
+          ) {
+            state.orderList.orderItems[data[0]].orderItemsOptions[
+              data[1]
+            ].quantity -= quantity;
           }
         }
       }
@@ -62,7 +112,9 @@ export const storeInfo = createSlice({
           state.orderList.orderItems[data[0]].quantity += quantity;
         }
         if (data.length === 2) {
-          state.orderList.orderItems[data[0]].orderItemsOptions[data[1]].quantity += quantity;
+          state.orderList.orderItems[data[0]].orderItemsOptions[
+            data[1]
+          ].quantity += quantity;
         }
       }
     },
@@ -90,10 +142,35 @@ export const storeInfo = createSlice({
     changeDiscount: (state, action) => {
       state.orderList.discount = action.payload;
     },
+
+    /**
+     * @description: 修改信息表单
+     * @return {*}
+     */
+    changeInfomation: (state, action) => {
+      state.infomation.push(action.payload);
+    },
+
+    /**
+     * @description: 修改桌子信息
+     * @return {*}
+     */
+    changeTable: (state, action) => {
+      state.table = action.payload;
+    },
   },
 });
 
 // Action creators are generated for each case reducer function
-export const { getStoreInfo, addOrderItems, changeOrderItems, changeOrderType, changeTips, changeDiscount } = storeInfo.actions;
+export const {
+  getStoreInfo,
+  addOrderItems,
+  changeOrderItems,
+  changeOrderType,
+  changeTips,
+  changeDiscount,
+  changeInfomation,
+  changeTable,
+} = storeInfo.actions;
 
 export default storeInfo.reducer;

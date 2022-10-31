@@ -1,5 +1,9 @@
 import { Button, Popover, Dropdown, Menu, Input, Modal, Calendar } from "antd";
-import { ExclamationCircleOutlined, MinusCircleOutlined, PlusCircleOutlined } from "@ant-design/icons";
+import {
+  ExclamationCircleOutlined,
+  MinusCircleOutlined,
+  PlusCircleOutlined,
+} from "@ant-design/icons";
 import React, { useEffect, useRef, useState } from "react";
 import { dish } from "../../Mock";
 import {
@@ -34,7 +38,11 @@ import Keyboard from "../../component/Keyboard";
 import Notepad from "./commponent/Notepad";
 import { useDispatch, useSelector } from "react-redux";
 import OptionsList from "./commponent/OptionsList";
-import { addOrderItems, changeOrderItems, changeOrderType } from "../../src/store/storeInfoSlice";
+import {
+  addOrderItems,
+  changeOrderItems,
+  changeOrderType,
+} from "../../src/store/storeInfoSlice";
 
 const { confirm } = Modal;
 
@@ -49,9 +57,6 @@ const OrderPage = () => {
   const dispatch = useDispatch();
 
   const orderList = useSelector((state) => state.orderList);
-
-  // 获取屏幕宽度
-  const windowWidth = document.body.clientWidth;
 
   // 菜单列表
   const [dishList, setDishList] = useState([]);
@@ -103,45 +108,23 @@ const OrderPage = () => {
   // 分页数量
   const [pageIndex, setPageIndex] = useState(0);
 
+  // 获取菜单原dom属性
   const category = useRef(null);
 
   // 按照尺寸进行计算
   useEffect(() => {
-    // if (windowWidth < 1745 && windowWidth >= 1607) {
-    //   setPageIndex(30);
-    // } else if (windowWidth < 1606 && windowWidth >= 1468) {
-    //   setPageIndex(27);
-    // } else if (windowWidth <= 1467 && windowWidth >= 1329) {
-    //   setPageIndex(24);
-    // } else if (windowWidth <= 1328 && windowWidth >= 1191) {
-    //   setPageIndex(21);
-    // } else if (windowWidth <= 1190 && windowWidth >= 1069) {
-    //   setPageIndex(18);
-    // } else if (windowWidth <= 1068 && windowWidth >= 965) {
-    //   setPageIndex(15);
-    // } else if (windowWidth <= 964 && windowWidth >= 861) {
-    //   setPageIndex(12);
-    // } else if (windowWidth <= 860 && windowWidth >= 750) {
-    //   setPageIndex(9);
-    // }
-    setPageIndex(
-      Math.floor((category.current.offsetWidth / 110) * 3) % 3 !== 0
-        ? Math.floor((category.current.offsetWidth / 110) * 3) + (3 - (Math.floor((category.current.offsetWidth / 110) * 3) % 3))
-        : Math.floor((category.current.offsetWidth / 110) * 3)
-    );
-    console.log((category.current.offsetWidth / 110) * 3);
+    let temp = 0;
+    temp = Math.floor(category.current.offsetWidth / 100) * 3;
+    setPageIndex(temp);
   }, []);
 
   // 尺寸计算结束执行
   useEffect(() => {
     if (pageIndex !== 0) {
+      console.log(pageIndex);
       paging();
     }
   }, [pageIndex]);
-
-  // useEffect(() => {
-  //   console.log(dishs);
-  // }, [dishs]);
 
   /**
    * @description: 弹窗显示
@@ -379,7 +362,11 @@ const OrderPage = () => {
    */
   const changeDishs = (item) => {
     let temp = item.items;
-    if (JSON.stringify(temp) !== "[]" && temp[temp.length - 1].length === 1 && temp.length > 1) {
+    if (
+      JSON.stringify(temp) !== "[]" &&
+      temp[temp.length - 1].length === 1 &&
+      temp.length > 1
+    ) {
       temp[temp.length - 2].push(temp[temp.length - 1][0]);
       temp.splice(-1, 1);
     }
@@ -441,60 +428,66 @@ const OrderPage = () => {
         changeOrderInfo={changeOrderInfo}
         orderInfo={orderInfo}
       />
-      <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
-        <div className='order-header'>
-          <div className='order-header-title'>Language</div>
-          <Earth color='#fff' />
+      <div
+        style={{ display: "flex", flexDirection: "column", height: "100vh" }}
+      >
+        <div className="order-header">
+          <div className="order-header-title">Language</div>
+          <Earth color="#fff" />
         </div>
-        <div className='order-content'>
-          <div className='order-box1'>
-            <div className='order-box1-content'>
-              <div className='order-content-title'>Category</div>
-              <div className='order-content-category' ref={category}>
+        <div className="order-content">
+          <div className="order-box1">
+            <div className="order-box1-content">
+              <div className="order-content-title">Category</div>
+              <div className="order-content-category" ref={category}>
                 {pageNumber > 0 && (
                   <Button
-                    type='primary'
-                    className='order-content-category-btn'
+                    type="primary"
+                    className="order-content-category-btn"
                     onClick={() => {
                       setPageNumber((prve) => (prve -= 1));
-                    }}>
+                    }}
+                  >
                     Last Page
                   </Button>
                 )}
 
                 {dishList[pageNumber]?.map((item, index) => (
                   <Button
-                    type='text'
-                    className='order-content-category-btn'
+                    type="text"
+                    className="order-content-category-btn"
                     key={index.toString()}
                     onClick={() => {
                       changeDishs(item);
-                    }}>
+                    }}
+                  >
                     {item.name}
                   </Button>
                 ))}
                 {dishList.length > pageNumber + 1 && (
                   <Button
-                    type='primary'
-                    className='order-content-category-btn'
+                    type="primary"
+                    className="order-content-category-btn"
                     onClick={() => {
                       setPageNumber((prve) => (prve += 1));
-                    }}>
+                    }}
+                  >
                     Next Page
                   </Button>
                 )}
               </div>
             </div>
-            <div className='order-box1-content'>
-              <div className='order-content-title'>Dishes</div>
-              <div className='order-content-category'>
+            <div className="order-box1-content">
+              <div className="order-content-title">Dishes</div>
+              <div className="order-content-category">
                 {dishNumber > 0 && (
                   <Button
-                    type='primary'
-                    className='order-content-category-btn'
+                    type="primary"
+                    className="order-content-category-btn"
                     onClick={() => {
                       setDishNumber((prve) => (prve -= 1));
-                    }}>
+                    }}
+                  >
                     Next Page
                   </Button>
                 )}
@@ -502,195 +495,330 @@ const OrderPage = () => {
                 {JSON.stringify(dishs) !== "[]" &&
                   dishs[dishNumber].map((item, index) => (
                     <Button
-                      type='text'
-                      className='order-content-category-btn'
+                      type="text"
+                      className="order-content-category-btn"
                       key={index.toString()}
                       onClick={() => {
                         setDishShow(true);
-                      }}>
+                      }}
+                    >
                       {item.name}
                     </Button>
                   ))}
 
                 {dishs.length > dishNumber + 1 && (
                   <Button
-                    type='primary'
-                    className='order-content-category-btn'
+                    type="primary"
+                    className="order-content-category-btn"
                     onClick={() => {
                       setDishNumber((prve) => (prve += 1));
-                    }}>
+                    }}
+                  >
                     Next Page
                   </Button>
                 )}
               </div>
             </div>
-            <div className='order-box1-bottom'>
-              <Button className='order-box1-bottom-btn'>Meat</Button>
-              <Button className='order-box1-bottom-btn'>Vegetable</Button>
-              <Button className='order-box1-bottom-btn'>Taste</Button>
-              <Button className='order-box1-bottom-btn'>Others</Button>
+            <div className="order-box1-bottom">
+              <Button className="order-box1-bottom-btn">Meat</Button>
+              <Button className="order-box1-bottom-btn">Vegetable</Button>
+              <Button className="order-box1-bottom-btn">Taste</Button>
+              <Button className="order-box1-bottom-btn">Others</Button>
             </div>
           </div>
 
-          <div className='order-box2'>
-            <Notepad orderList={orderList} notepadList={notepadList} setNotepadList={setNotepadList} />
-            <div className='order-box2-sort'>
-              <Button type='primary' className='order-box2-sort-btn'>
+          <div className="order-box2">
+            <Notepad
+              orderList={orderList}
+              notepadList={notepadList}
+              setNotepadList={setNotepadList}
+            />
+            <div className="order-box2-sort">
+              <Button type="primary" className="order-box2-sort-btn">
                 <Up />
                 <div>Up</div>
               </Button>
-              <Button type='primary' className='order-box2-sort-btn' style={{ background: "#FFF", color: "#0076fe" }}>
+              <Button
+                type="primary"
+                className="order-box2-sort-btn"
+                style={{ background: "#FFF", color: "#0076fe" }}
+              >
                 <Down />
                 <div>Down</div>
               </Button>
             </div>
-            <div className='order-box2-qty'>
+            <div className="order-box2-qty">
               <Popover
-                placement='leftBottom'
-                content={<ChangePrice type={"qty"} notepadList={notepadList} quit={setQty} />}
-                trigger='click'
+                placement="leftBottom"
+                content={
+                  <ChangePrice
+                    type={"qty"}
+                    notepadList={notepadList}
+                    quit={setQty}
+                  />
+                }
+                trigger="click"
                 open={qty}
-                onOpenChange={() => setQty((prev) => !prev)}>
-                <Button className='order-box2-qty-item'>Qty</Button>
+                onOpenChange={() => setQty((prev) => !prev)}
+              >
+                <Button className="order-box2-qty-item">Qty</Button>
               </Popover>
               <Button
-                className='order-box2-qty-item'
+                className="order-box2-qty-item"
                 style={{ margin: "0 10px" }}
                 onClick={() => {
-                  dispatch(changeOrderItems({ type: "reduce", data: notepadList, quantity: 1 }));
-                }}>
+                  dispatch(
+                    changeOrderItems({
+                      type: "reduce",
+                      data: notepadList,
+                      quantity: 1,
+                    })
+                  );
+                }}
+              >
                 <Subtract />
               </Button>
               <Button
-                className='order-box2-qty-item'
+                className="order-box2-qty-item"
                 onClick={() => {
-                  dispatch(changeOrderItems({ type: "add", data: notepadList, quantity: 1 }));
-                }}>
+                  dispatch(
+                    changeOrderItems({
+                      type: "add",
+                      data: notepadList,
+                      quantity: 1,
+                    })
+                  );
+                }}
+              >
                 <Add />
               </Button>
             </div>
-            <div className='order-box2-qty'>
-              <Button className='order-box2-qty-item' style={{ height: "auto" }}>
+            <div className="order-box2-qty">
+              <Button
+                className="order-box2-qty-item"
+                style={{ height: "auto" }}
+              >
                 <Wallet />
                 <div>Payment</div>
               </Button>
-              <Button className='order-box2-qty-item' style={{ margin: "0 10px", height: "auto" }}>
+              <Button
+                className="order-box2-qty-item"
+                style={{ margin: "0 10px", height: "auto" }}
+              >
                 <Printer />
                 <div>Save</div>
               </Button>
-              <Button className='order-box2-qty-item' style={{ height: "auto" }}>
+              <Button
+                className="order-box2-qty-item"
+                style={{ height: "auto" }}
+              >
                 <Printer />
                 <div>Print</div>
               </Button>
             </div>
           </div>
-          <div className='order-box3'>
+          <div className="order-box3">
             <Button
-              className='order-box3-btn'
+              className="order-box3-btn"
               style={{ border: "1px solid #FE4A1B" }}
               onClick={() => {
                 navigate(-1);
-              }}>
+              }}
+            >
               <Quit />
               <div style={{ color: "#FE4A1B" }}>Quit</div>
             </Button>
             <Popover
-              placement='leftTop'
+              placement="leftTop"
               content={<OrderType />}
-              trigger='click'
+              trigger="click"
               open={orderTypeShow}
-              onOpenChange={() => setOrderTypeShow((prev) => !prev)}>
+              onOpenChange={() => setOrderTypeShow((prev) => !prev)}
+            >
               <Button
-                className='order-box3-btn'
+                className="order-box3-btn"
                 onClick={() => {
                   setCheckText("Order Type");
                 }}
-                style={{ background: checkText === "Order Type" ? "#0076fe" : "#FFF" }}>
-                {checkText === "Order Type" ? <Type color={"#fff"} /> : <Type color={"#0076fe"} />}
-                <div style={{ color: checkText === "Order Type" ? "#FFF" : "#0076fe" }}>Order Type</div>
+                style={{
+                  background: checkText === "Order Type" ? "#0076fe" : "#FFF",
+                }}
+              >
+                {checkText === "Order Type" ? (
+                  <Type color={"#fff"} />
+                ) : (
+                  <Type color={"#0076fe"} />
+                )}
+                <div
+                  style={{
+                    color: checkText === "Order Type" ? "#FFF" : "#0076fe",
+                  }}
+                >
+                  Order Type
+                </div>
               </Button>
             </Popover>
             <Popover
-              placement='left'
+              placement="left"
               content={<SetTime setSetTimeShow={setSetTimeShow} />}
-              trigger='click'
+              trigger="click"
               open={setTimeShow}
-              onOpenChange={() => setSetTimeShow((prev) => !prev)}>
+              onOpenChange={() => setSetTimeShow((prev) => !prev)}
+            >
               <Button
-                className='order-box3-btn'
+                className="order-box3-btn"
                 onClick={() => {
                   setCheckText("Set time");
                 }}
-                style={{ background: checkText === "Set time" ? "#0076fe" : "#FFF" }}>
-                {checkText === "Set time" ? <Clock color={"#fff"} /> : <Clock color={"#0076fe"} />}
-                <div style={{ color: checkText === "Set time" ? "#FFF" : "#0076fe" }}>Set time</div>
+                style={{
+                  background: checkText === "Set time" ? "#0076fe" : "#FFF",
+                }}
+              >
+                {checkText === "Set time" ? (
+                  <Clock color={"#fff"} />
+                ) : (
+                  <Clock color={"#0076fe"} />
+                )}
+                <div
+                  style={{
+                    color: checkText === "Set time" ? "#FFF" : "#0076fe",
+                  }}
+                >
+                  Set time
+                </div>
               </Button>
             </Popover>
             <Button
-              className='order-box3-btn'
+              className="order-box3-btn"
               onClick={() => {
                 setCheckText("Set price");
               }}
-              style={{ background: checkText === "Set price" ? "#0076fe" : "#FFF" }}>
-              {checkText === "Set price" ? <Price color={"#fff"} /> : <Price color={"#0076fe"} />}
-              <div style={{ color: checkText === "Set price" ? "#FFF" : "#0076fe" }}>Set price</div>
+              style={{
+                background: checkText === "Set price" ? "#0076fe" : "#FFF",
+              }}
+            >
+              {checkText === "Set price" ? (
+                <Price color={"#fff"} />
+              ) : (
+                <Price color={"#0076fe"} />
+              )}
+              <div
+                style={{
+                  color: checkText === "Set price" ? "#FFF" : "#0076fe",
+                }}
+              >
+                Set price
+              </div>
             </Button>
             <Popover
-              placement='left'
+              placement="left"
               content={<SelfInput setSelfInputShow={setSelfInputShow} />}
-              trigger='click'
+              trigger="click"
               open={selfInputShow}
-              onOpenChange={() => setSelfInputShow((prev) => !prev)}>
+              onOpenChange={() => setSelfInputShow((prev) => !prev)}
+            >
               <Button
-                className='order-box3-btn'
+                className="order-box3-btn"
                 onClick={() => {
                   setCheckText("Self Input");
                 }}
-                style={{ background: checkText === "Self Input" ? "#0076fe" : "#FFF" }}>
-                {checkText === "Self Input" ? <File color={"#fff"} /> : <File color={"#0076fe"} />}
-                <div style={{ color: checkText === "Self Input" ? "#FFF" : "#0076fe" }}>Self Input</div>
+                style={{
+                  background: checkText === "Self Input" ? "#0076fe" : "#FFF",
+                }}
+              >
+                {checkText === "Self Input" ? (
+                  <File color={"#fff"} />
+                ) : (
+                  <File color={"#0076fe"} />
+                )}
+                <div
+                  style={{
+                    color: checkText === "Self Input" ? "#FFF" : "#0076fe",
+                  }}
+                >
+                  Self Input
+                </div>
               </Button>
             </Popover>
             <Button
-              className='order-box3-btn'
+              className="order-box3-btn"
               onClick={() => {
                 setCheckText("Split Check");
                 SplitCheck();
               }}
-              style={{ background: checkText === "Split Check" ? "#0076fe" : "#FFF" }}>
-              {checkText === "Split Check" ? <Split color={"#fff"} /> : <Split color={"#0076fe"} />}
-              <div style={{ color: checkText === "Split Check" ? "#FFF" : "#0076fe" }}>Split Check</div>
+              style={{
+                background: checkText === "Split Check" ? "#0076fe" : "#FFF",
+              }}
+            >
+              {checkText === "Split Check" ? (
+                <Split color={"#fff"} />
+              ) : (
+                <Split color={"#0076fe"} />
+              )}
+              <div
+                style={{
+                  color: checkText === "Split Check" ? "#FFF" : "#0076fe",
+                }}
+              >
+                Split Check
+              </div>
             </Button>
             <Popover
-              placement='leftBottom'
+              placement="leftBottom"
               content={<ChangePrice type={"discount"} quit={setDiscountShow} />}
-              trigger='click'
+              trigger="click"
               open={discountShow}
-              onOpenChange={() => setDiscountShow((prev) => !prev)}>
+              onOpenChange={() => setDiscountShow((prev) => !prev)}
+            >
               <Button
-                className='order-box3-btn'
+                className="order-box3-btn"
                 onClick={() => {
                   setCheckText("Discount");
                 }}
-                style={{ background: checkText === "Discount" ? "#0076fe" : "#FFF" }}>
-                {checkText === "Discount" ? <Discount color={"#fff"} /> : <Discount color={"#0076fe"} />}
-                <div style={{ color: checkText === "Discount" ? "#FFF" : "#0076fe" }}>Discount</div>
+                style={{
+                  background: checkText === "Discount" ? "#0076fe" : "#FFF",
+                }}
+              >
+                {checkText === "Discount" ? (
+                  <Discount color={"#fff"} />
+                ) : (
+                  <Discount color={"#0076fe"} />
+                )}
+                <div
+                  style={{
+                    color: checkText === "Discount" ? "#FFF" : "#0076fe",
+                  }}
+                >
+                  Discount
+                </div>
               </Button>
             </Popover>
             <Popover
-              placement='leftBottom'
+              placement="leftBottom"
               content={<ChangePrice type={"tips"} quit={setTipsShow} />}
-              trigger='click'
+              trigger="click"
               open={tipsShow}
-              onOpenChange={() => setTipsShow((prev) => !prev)}>
+              onOpenChange={() => setTipsShow((prev) => !prev)}
+            >
               <Button
-                className='order-box3-btn'
+                className="order-box3-btn"
                 onClick={() => {
                   setCheckText("Tips");
                 }}
-                style={{ background: checkText === "Tips" ? "#0076fe" : "#FFF" }}>
-                {checkText === "Tips" ? <Tips color={"#fff"} /> : <Tips color={"#0076fe"} />}
-                <div style={{ color: checkText === "Tips" ? "#FFF" : "#0076fe" }}>Tips</div>
+                style={{
+                  background: checkText === "Tips" ? "#0076fe" : "#FFF",
+                }}
+              >
+                {checkText === "Tips" ? (
+                  <Tips color={"#fff"} />
+                ) : (
+                  <Tips color={"#0076fe"} />
+                )}
+                <div
+                  style={{ color: checkText === "Tips" ? "#FFF" : "#0076fe" }}
+                >
+                  Tips
+                </div>
               </Button>
             </Popover>
           </div>
@@ -716,39 +844,56 @@ const OrderType = () => {
     <div style={{ padding: 20 }}>
       <div>
         <Button
-          className='orderType-btn'
+          className="orderType-btn"
           onClick={() => {
             dispatch(changeOrderType("Walk In"));
           }}
-          style={{ background: orderType === "Walk In" ? "#0076fe" : "#FFF", color: orderType === "Walk In" ? "#fff" : "#0076fe" }}>
+          style={{
+            background: orderType === "Walk In" ? "#0076fe" : "#FFF",
+            color: orderType === "Walk In" ? "#fff" : "#0076fe",
+          }}
+        >
           <Pedestrian color={orderType === "Walk In" ? "#fff" : "#0076fe"} />
           <div>Walk In</div>
         </Button>
-        <Button className='orderType-btn' style={{ margin: "0 10px" }} onClick={() => {}}>
+        <Button
+          className="orderType-btn"
+          style={{ margin: "0 10px" }}
+          onClick={() => {}}
+        >
           <DineIn color={"#0076fe"} />
           <div>Dine In</div>
         </Button>
         <Button
-          className='orderType-btn'
+          className="orderType-btn"
           onClick={() => {
             dispatch(changeOrderType("Pick Up"));
           }}
-          style={{ background: orderType === "Pick Up" ? "#0076fe" : "#FFF", color: orderType === "Pick Up" ? "#fff" : "#0076fe" }}>
+          style={{
+            background: orderType === "Pick Up" ? "#0076fe" : "#FFF",
+            color: orderType === "Pick Up" ? "#fff" : "#0076fe",
+          }}
+        >
           <BagFull color={orderType === "Pick Up" ? "#fff" : "#0076fe"} />
           <div>Pick Up</div>
         </Button>
       </div>
       <div style={{ marginTop: 10 }}>
         <Button
-          className='orderType-btn'
-          style={{ marginRight: 10, background: orderType === "Delivery" ? "#0076fe" : "#FFF", color: orderType === "Delivery" ? "#fff" : "#0076fe" }}
+          className="orderType-btn"
+          style={{
+            marginRight: 10,
+            background: orderType === "Delivery" ? "#0076fe" : "#FFF",
+            color: orderType === "Delivery" ? "#fff" : "#0076fe",
+          }}
           onClick={() => {
             dispatch(changeOrderType("Delivery"));
-          }}>
+          }}
+        >
           <ElectricCar color={orderType === "Delivery" ? "#fff" : "#0076fe"} />
           <div>Delivery</div>
         </Button>
-        <Button className='orderType-btn' onClick={() => {}}>
+        <Button className="orderType-btn" onClick={() => {}}>
           <UserSetting color={"#0076fe"} />
           <div>Buffet</div>
         </Button>
@@ -811,16 +956,16 @@ const SetTime = ({ setSetTimeShow }) => {
     console.log(value.format("YYYY-MM-DD"), mode);
   };
   return (
-    <div className='setTime'>
-      <div className='setTime-title'>
-        <div className='setTime-title-time'>
+    <div className="setTime">
+      <div className="setTime-title">
+        <div className="setTime-title-time">
           2022年10月
-          <div className='setTime-Dropdown'>
-            <Dropdown overlay={<SetTimeHour />} placement='bottom' arrow>
+          <div className="setTime-Dropdown">
+            <Dropdown overlay={<SetTimeHour />} placement="bottom" arrow>
               <Button>23</Button>
             </Dropdown>
             :
-            <Dropdown overlay={<SetTimeHour />} placement='bottom' arrow>
+            <Dropdown overlay={<SetTimeHour />} placement="bottom" arrow>
               <Button>23</Button>
             </Dropdown>
           </div>
@@ -830,28 +975,40 @@ const SetTime = ({ setSetTimeShow }) => {
           <Button>下个月</Button>
         </div>
       </div>
-      <div className='setTime-calendar'>
-        <Calendar fullscreen={false} onPanelChange={onPanelChange} style={{ width: 450 }} />
-        <div className='setTime-calendar-btn'>
-          <div className='setTime-calendar-btn'>
-            <Button className='setTime-calendar-btn-item'>
+      <div className="setTime-calendar">
+        <Calendar
+          fullscreen={false}
+          onPanelChange={onPanelChange}
+          style={{ width: 450 }}
+        />
+        <div className="setTime-calendar-btn">
+          <div className="setTime-calendar-btn">
+            <Button className="setTime-calendar-btn-item">
               <CalendarSvg />
               <div style={{ marginLeft: 8 }}>Now</div>
             </Button>
-            <Button className='setTime-calendar-btn-item' style={{ marginLeft: 10 }}>
+            <Button
+              className="setTime-calendar-btn-item"
+              style={{ marginLeft: 10 }}
+            >
               <RefuseBin color={"#0076fe"} />
               <div style={{ marginLeft: 8 }}>Clear</div>
             </Button>
           </div>
-          <div className='setTime-calendar-btn'>
-            <Button className='setTime-calendar-btn-item'>
+          <div className="setTime-calendar-btn">
+            <Button className="setTime-calendar-btn-item">
               <Save />
               <div style={{ marginLeft: 8 }}>Save</div>
             </Button>
             <Button
-              className='setTime-calendar-btn-item'
-              style={{ marginLeft: 10, border: "1px solid #FE4A1B", color: "#FE4A1B" }}
-              onClick={() => setSetTimeShow((prev) => !prev)}>
+              className="setTime-calendar-btn-item"
+              style={{
+                marginLeft: 10,
+                border: "1px solid #FE4A1B",
+                color: "#FE4A1B",
+              }}
+              onClick={() => setSetTimeShow((prev) => !prev)}
+            >
               <Quit />
               <div style={{ marginLeft: 8 }}>退出</div>
             </Button>
@@ -895,113 +1052,139 @@ const SelfInput = ({ setSelfInputShow }) => {
   const [distinguish, setDistinguish] = useState("name");
 
   return (
-    <div className='selfInput'>
-      <div className='selfInput-content'>
-        <div className='selfInput-content-left'>
-          <div className='selfInput-content-left-item'>
+    <div className="selfInput">
+      <div className="selfInput-content">
+        <div className="selfInput-content-left">
+          <div className="selfInput-content-left-item">
             <div style={{ minWidth: 70 }}>Name:</div>
             <Input
-              className='selfInput-content-left-item-input'
+              className="selfInput-content-left-item-input"
               value={name}
               onClick={() => {
                 setDistinguish("name");
               }}
-              style={{ borderColor: distinguish === "name" ? "#0076fe" : "#333" }}
+              style={{
+                borderColor: distinguish === "name" ? "#0076fe" : "#333",
+              }}
             />
           </div>
-          <div className='selfInput-content-left-item'>
+          <div className="selfInput-content-left-item">
             <div style={{ minWidth: 70 }}>Price:</div>
             <Input
-              className='selfInput-content-left-item-input'
+              className="selfInput-content-left-item-input"
               value={price}
               onClick={() => {
                 setDistinguish("price");
               }}
-              style={{ borderColor: distinguish === "price" ? "#0076fe" : "#333" }}
+              style={{
+                borderColor: distinguish === "price" ? "#0076fe" : "#333",
+              }}
             />
             <Button
-              type='primary'
-              className='selfInput-content-left-item-btn'
+              type="primary"
+              className="selfInput-content-left-item-btn"
               onClick={() => {
                 setPrice((prev) => (prev += 3));
                 setDistinguish("price");
-              }}>
+              }}
+            >
               3.00
             </Button>
             <Button
-              type='primary'
-              className='selfInput-content-left-item-btn'
+              type="primary"
+              className="selfInput-content-left-item-btn"
               onClick={() => {
                 setPrice((prev) => (prev += 4));
                 setDistinguish("price");
-              }}>
+              }}
+            >
               4.00
             </Button>
           </div>
-          <div className='selfInput-content-left-item'>
+          <div className="selfInput-content-left-item">
             <div style={{ minWidth: 70 }}>Quantitly:</div>
             <Input
-              className='selfInput-content-left-item-input'
+              className="selfInput-content-left-item-input"
               value={quantitly}
               onClick={() => {
                 setDistinguish("quantitly");
               }}
-              style={{ borderColor: distinguish === "quantitly" ? "#0076fe" : "#333" }}
+              style={{
+                borderColor: distinguish === "quantitly" ? "#0076fe" : "#333",
+              }}
             />
             <Button
-              type='primary'
-              className='selfInput-content-left-item-btn'
+              type="primary"
+              className="selfInput-content-left-item-btn"
               onClick={() => {
                 setQuantitly((prev) => (prev += 3));
                 setDistinguish("quantitly");
-              }}>
+              }}
+            >
               3.00
             </Button>
             <Button
-              type='primary'
-              className='selfInput-content-left-item-btn'
+              type="primary"
+              className="selfInput-content-left-item-btn"
               onClick={() => {
                 setQuantitly((prev) => (prev += 4));
                 setDistinguish("quantitly");
-              }}>
+              }}
+            >
               4.00
             </Button>
           </div>
         </div>
-        <div className='selfInput-content-right'>
+        <div className="selfInput-content-right">
           <div style={{ minWidth: 70 }}>Print to:</div>
-          <div className='selfInput-content-right-box'>
-            <div className='selfInput-content-right-printer'>
-              <div className='selfInput-content-right-printer-item'>
+          <div className="selfInput-content-right-box">
+            <div className="selfInput-content-right-printer">
+              <div className="selfInput-content-right-printer-item">
                 <Printer color={"#333"} />
                 <div style={{ marginLeft: 8 }}>Printer No.1</div>
               </div>
-              <div className='selfInput-content-right-printer-item'>
+              <div className="selfInput-content-right-printer-item">
                 <Printer color={"#333"} />
                 <div style={{ marginLeft: 8 }}>Printer No.1</div>
               </div>
             </div>
             <div style={{ marginTop: 10 }}>
-              <Button className='selfInput-content-right-btn'>Up</Button>
-              <Button className='selfInput-content-right-btn' style={{ marginLeft: 8 }}>
+              <Button className="selfInput-content-right-btn">Up</Button>
+              <Button
+                className="selfInput-content-right-btn"
+                style={{ marginLeft: 8 }}
+              >
                 Down
               </Button>
             </div>
           </div>
         </div>
       </div>
-      <Keyboard changeText={distinguish === "name" ? setName : distinguish === "price" ? setPrice : setQuantitly} />
-      <div className='selfInput-btn'>
-        <Button className='selfInput-btn-item'>
+      <Keyboard
+        changeText={
+          distinguish === "name"
+            ? setName
+            : distinguish === "price"
+            ? setPrice
+            : setQuantitly
+        }
+      />
+      <div className="selfInput-btn">
+        <Button className="selfInput-btn-item">
           <Save />
           Save
         </Button>
         <Button
-          className='selfInput-btn-item'
-          style={{ border: "1px solid #FE4A1B", color: "#FE4A1B", marginLeft: 10 }}
+          className="selfInput-btn-item"
+          style={{
+            border: "1px solid #FE4A1B",
+            color: "#FE4A1B",
+            marginLeft: 10,
+          }}
           onClick={() => {
             setSelfInputShow((prev) => !prev);
-          }}>
+          }}
+        >
           <Quit />
           Quit
         </Button>
@@ -1027,7 +1210,16 @@ const SplitCheck = () => {
   });
 };
 
-const DishList = ({ dishShow, touchOK, touchCancel, mock, orderListTemp, setOrderListTemp, changeOrderInfo, orderInfo }) => {
+const DishList = ({
+  dishShow,
+  touchOK,
+  touchCancel,
+  mock,
+  orderListTemp,
+  setOrderListTemp,
+  changeOrderInfo,
+  orderInfo,
+}) => {
   const [price, setPrice] = useState(0);
 
   // useEffect(() => {
@@ -1151,7 +1343,10 @@ const DishList = ({ dishShow, touchOK, touchCancel, mock, orderListTemp, setOrde
       onOk={touchOK}
       centered
       footer={[
-        <div key='dish' style={{ display: "flex", alignItems: "center", marginRight: 10 }}>
+        <div
+          key="dish"
+          style={{ display: "flex", alignItems: "center", marginRight: 10 }}
+        >
           <MinusCircleOutlined
             style={{ fontSize: 20 }}
             onClick={() => {
@@ -1160,7 +1355,7 @@ const DishList = ({ dishShow, touchOK, touchCancel, mock, orderListTemp, setOrde
               }
             }}
           />
-          <div className='dishList-number'>{orderInfo.quantity}</div>
+          <div className="dishList-number">{orderInfo.quantity}</div>
           <PlusCircleOutlined
             style={{ fontSize: 20 }}
             onClick={() => {
@@ -1169,10 +1364,16 @@ const DishList = ({ dishShow, touchOK, touchCancel, mock, orderListTemp, setOrde
           />
         </div>,
         // <Button key='OK' type='primary' onClick={touchOK} style={{ fontWeight: "bold" }}>
-        <Button key='OK' type='primary' onClick={submit} style={{ fontWeight: "bold" }}>
+        <Button
+          key="OK"
+          type="primary"
+          onClick={submit}
+          style={{ fontWeight: "bold" }}
+        >
           ${price.toFixed(2)} - Add to cart
         </Button>,
-      ]}>
+      ]}
+    >
       {mock.optionsList.map((item, index) => (
         <OptionsList
           key={index.toString()}

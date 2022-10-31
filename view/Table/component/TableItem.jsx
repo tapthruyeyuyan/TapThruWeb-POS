@@ -1,21 +1,29 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./TableItem.less";
 
-const TableItem = ({ box, parmas }) => {
+const TableItem = ({
+  box,
+  parmas,
+  item,
+  index,
+  setTableId,
+  tableId,
+  setTableIndex,
+  changeTablePosition,
+}) => {
   const move = useRef(null);
-  const [tarnslate, setTarnslate] = useState({ x: 0, y: 0 });
+  const [tarnslate, setTarnslate] = useState({ x: item.x, y: item.y });
 
-  useEffect(() => {
-    console.log(parmas);
-  }, []);
-
-  //   useEffect(() => {
-  //     console.log(box.current.scrollWidth, box.current.scrollHeight);
-  //   }, [box]);
-
+  /**
+   * @description: 移动事件
+   * @param {*} e
+   * @return {*}
+   */
   const changeMove = (e) => {
     let startX = e.clientX - move.current.offsetLeft;
     let statrY = e.clientY - move.current.offsetTop;
+    setTableId(item.id);
+    setTableIndex(index);
 
     window.onmousemove = function (e) {
       let tarnslateX = e.clientX - startX;
@@ -35,8 +43,8 @@ const TableItem = ({ box, parmas }) => {
       if (box.current.scrollHeight - 44 <= tarnslateY) {
         tarnslateY = box.current.scrollHeight - 44;
       }
-
-      setTarnslate({ ...tarnslate, x: tarnslateX, y: tarnslateY });
+      changeTablePosition(index, tarnslateX, tarnslateY);
+      // setTarnslate({ ...tarnslate, x: tarnslateX, y: tarnslateY });
     };
 
     window.onmouseup = function (e) {
@@ -47,15 +55,20 @@ const TableItem = ({ box, parmas }) => {
 
   return (
     <div
-      className='tableItem'
-      style={{ left: tarnslate.x, top: tarnslate.y }}
+      className="tableItem"
+      style={{
+        left: item.x,
+        top: item.y,
+        background: tableId === item.id && "#0076fe",
+      }}
       ref={move}
       onMouseDown={(e) => {
         if (parmas === "setup") {
           changeMove(e);
         }
-      }}>
-      A1
+      }}
+    >
+      {item.name}
     </div>
   );
 };
