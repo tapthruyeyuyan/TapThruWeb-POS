@@ -88,7 +88,7 @@ const Routers = () => {
       component: <SetupPW />,
     },
     {
-      path: "/user-info",
+      path: "/user-info/:index",
       auth: true,
       component: <UserInfo />,
     },
@@ -136,9 +136,16 @@ const Routers = () => {
         <Route
           path={item.path}
           element={
-            item.path === pathname && item.auth && JSON.stringify(store) === "{}" ? <Navigate to='/login' replace={true}></Navigate> : item.component
+            item.path === pathname &&
+            item.auth &&
+            JSON.stringify(store) === "{}" ? (
+              <Navigate to="/login" replace={true}></Navigate>
+            ) : (
+              item.component
+            )
           }
-          key={item.path}>
+          key={item.path}
+        >
           {item?.child && RouteNav(item.child)}
         </Route>
       );

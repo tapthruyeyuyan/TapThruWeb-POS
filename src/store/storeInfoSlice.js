@@ -48,6 +48,7 @@ const initialState = {
       ],
     },
   ],
+  setupPW: [],
 };
 
 export const storeInfo = createSlice({
@@ -158,6 +159,21 @@ export const storeInfo = createSlice({
     changeTable: (state, action) => {
       state.table = action.payload;
     },
+
+    /**
+     * @description: 修改用户信息
+     * @return {*}
+     */
+    changeUserInfo: (state, action) => {
+      const { type, data, index } = action.payload;
+      if (type === "add") {
+        state.setupPW.push(data);
+      }
+
+      if (type === "change") {
+        state.setupPW[index] = data;
+      }
+    },
   },
 });
 
@@ -171,6 +187,7 @@ export const {
   changeDiscount,
   changeInfomation,
   changeTable,
+  changeUserInfo,
 } = storeInfo.actions;
 
 export default storeInfo.reducer;

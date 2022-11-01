@@ -1,8 +1,19 @@
+/*
+ * @Author: tapthruyeyuyan 102268434+tapthruyeyuyan@users.noreply.github.com
+ * @Date: 2022-10-31 08:48:34
+ * @LastEditors: tapthruyeyuyan 102268434+tapthruyeyuyan@users.noreply.github.com
+ * @LastEditTime: 2022-11-01 11:29:33
+ * @FilePath: \TapThruWeb-POS\view\SetupPW\SetupPW.jsx
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
 import { Button } from "antd";
 import React from "react";
 import { Add, Quit } from "../../component/Svg/Svg";
 import "./SetupPW.less";
 import { useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { useEffect } from "react";
+import { changeUserInfo } from "../../src/store/storeInfoSlice";
 
 const SetupPW = () => {
   const mock = [
@@ -32,35 +43,69 @@ const SetupPW = () => {
     },
   ];
 
+  const userInfo = useSelector((state) => state.setupPW);
+
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    console.log(userInfo);
+  }, [userInfo]);
+
+  const newData = {
+    id: userInfo.length,
+    userName: "newData",
+    address: "",
+    telephone: "",
+    password: "",
+    address2: "",
+    grade: "",
+    city: "",
+    firstName: "",
+    state: "",
+    lastName: "",
+    zip: "",
+    position: "",
+    hourlyRate: "",
+    driver: false,
+  };
+
   const navigate = useNavigate();
 
   return (
-    <div className='setupPW'>
-      <div className='setupPW-content'>
-        <div className='setupPW-content-item'>
-          {mock.map((item) => (
-            <Button
-              key={item.id}
-              className='setupPW-content-btn'
-              onClick={() => {
-                navigate("/user-info");
-              }}>
-              {item.userName}
-            </Button>
-          ))}
+    <div className="setupPW">
+      <div className="setupPW-content">
+        <div className="setupPW-content-item">
+          {JSON.stringify(userInfo) !== "[]" &&
+            userInfo.map((item, index) => (
+              <Button
+                key={item.id}
+                className="setupPW-content-btn"
+                onClick={() => {
+                  navigate(`/user-info/${index}`);
+                }}
+              >
+                {item.userName}
+              </Button>
+            ))}
         </div>
       </div>
-      <div className='setupPW-btn'>
-        <Button className='setupPW-btn-item'>
+      <div className="setupPW-btn">
+        <Button
+          className="setupPW-btn-item"
+          onClick={() => {
+            dispatch(changeUserInfo({ type: "add", data: newData }));
+          }}
+        >
           <Add />
           <div style={{ marginLeft: 8 }}>Assign Staff</div>
         </Button>
         <Button
-          className='setupPW-btn-item'
+          className="setupPW-btn-item"
           style={{ border: "1px solid #FE4A1B", color: "#FE4A1B" }}
           onClick={() => {
             navigate(-1);
-          }}>
+          }}
+        >
           <Quit />
           <div style={{ marginLeft: 8 }}>Quit</div>
         </Button>
