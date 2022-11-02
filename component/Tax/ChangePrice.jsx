@@ -3,11 +3,11 @@ import React, { useEffect, useState } from "react";
 import "./ChangePrice.less";
 import { Quit, RefuseBin, Save } from "../Svg/Svg";
 import { useDispatch } from "react-redux";
-import { changeDiscount, changeOrderItems, changeTips } from "../../src/store/storeInfoSlice";
+import { changeDiscount, changeTips } from "../../src/store/storeInfoSlice";
 
 const { Search } = Input;
 
-const ChangePrice = ({ type, notepadList, quit }) => {
+const ChangePrice = ({ type, orderNumber, quit, changeOrderNumber }) => {
   const dispatch = useDispatch();
 
   /**
@@ -22,13 +22,11 @@ const ChangePrice = ({ type, notepadList, quit }) => {
    * @description: 设置输入框文字
    * @return {*}
    */
-  const [inputValue, setInputValue] = useState("");
+  const [inputValue, setInputValue] = useState(orderNumber ? orderNumber : "");
 
-  /**
-   * @description: 设置当前状态
-   * @return {*}
-   */
-  const [symbol, setSymbol] = useState("add");
+  useEffect(() => {
+    setInputValue(orderNumber ? orderNumber : "");
+  }, [orderNumber]);
 
   /**
    * @description: 键盘
@@ -62,7 +60,8 @@ const ChangePrice = ({ type, notepadList, quit }) => {
               className='price-keyboard-item'
               onClick={() => {
                 setInputValue((prev) => (prev += item));
-              }}>
+              }}
+            >
               {item}
             </div>
           ))}
@@ -74,7 +73,8 @@ const ChangePrice = ({ type, notepadList, quit }) => {
               className='price-keyboard-item'
               onClick={() => {
                 setInputValue((prev) => (prev += item));
-              }}>
+              }}
+            >
               {item}
             </div>
           ))}
@@ -86,7 +86,8 @@ const ChangePrice = ({ type, notepadList, quit }) => {
               className='price-keyboard-item'
               onClick={() => {
                 setInputValue((prev) => (prev += item));
-              }}>
+              }}
+            >
               {item}
             </div>
           ))}
@@ -97,7 +98,8 @@ const ChangePrice = ({ type, notepadList, quit }) => {
             style={{ width: type === "qty" ? 226 : 148 }}
             onClick={() => {
               setInputValue((prev) => (prev += 0));
-            }}>
+            }}
+          >
             0
           </div>
           {type !== "qty" && (
@@ -105,47 +107,18 @@ const ChangePrice = ({ type, notepadList, quit }) => {
               className='price-keyboard-item'
               onClick={() => {
                 setInputValue((prev) => (prev += "."));
-              }}>
+              }}
+            >
               .
             </div>
           )}
         </div>
       </div>
       <div className='price-right'>
-        {type !== "qty" ? (
+        {type !== "qty" && (
           <div>
             <div>Tax rate</div>
             <div className='price-right-title'>8.000%</div>
-          </div>
-        ) : (
-          <div>
-            <Button
-              className='price-right-btn'
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                background: symbol === "add" ? "#0076fe" : "#FFF",
-                color: symbol === "add" ? "#FFF" : "#0076fe",
-              }}
-              onClick={() => {
-                setSymbol("add");
-              }}>
-              <div>Add</div>
-            </Button>
-            <Button
-              className='price-right-btn'
-              style={{
-                marginTop: 10,
-                display: "flex",
-                justifyContent: "center",
-                background: symbol === "reduce" ? "#0076fe" : "#FFF",
-                color: symbol === "reduce" ? "#FFF" : "#0076fe",
-              }}
-              onClick={() => {
-                setSymbol("reduce");
-              }}>
-              <div>Reduce</div>
-            </Button>
           </div>
         )}
         <div>
@@ -153,7 +126,8 @@ const ChangePrice = ({ type, notepadList, quit }) => {
             className='price-right-btn'
             onClick={() => {
               if (type === "qty") {
-                dispatch(changeOrderItems({ type: symbol, data: notepadList, quantity: Number(inputValue) }));
+                // dispatch(changeOrderItems({ type: symbol, data: notepadList, quantity: Number(inputValue) }));
+                changeOrderNumber(Number(inputValue));
                 quit((prev) => (prev = false));
               }
 
@@ -168,16 +142,22 @@ const ChangePrice = ({ type, notepadList, quit }) => {
               }
 
               setInputValue("");
-            }}>
+            }}
+          >
             <Save />
             <div>Save</div>
           </Button>
           <Button
             className='price-right-btn'
-            style={{ marginTop: 20, border: "1px solid #FE4A1B", color: "#FE4A1B" }}
+            style={{
+              marginTop: 20,
+              border: "1px solid #FE4A1B",
+              color: "#FE4A1B",
+            }}
             onClick={() => {
               quit((prev) => (prev = false));
-            }}>
+            }}
+          >
             <Quit />
             <div>Quit</div>
           </Button>

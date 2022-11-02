@@ -1,9 +1,5 @@
-import { Button, Popover, Dropdown, Menu, Input, Modal, Calendar } from "antd";
-import {
-  ExclamationCircleOutlined,
-  MinusCircleOutlined,
-  PlusCircleOutlined,
-} from "@ant-design/icons";
+import { Button, Popover, Menu, Modal, Calendar, Col, Radio, Row, Select, Typography } from "antd";
+import { ExclamationCircleOutlined, MinusCircleOutlined, PlusCircleOutlined } from "@ant-design/icons";
 import React, { useEffect, useRef, useState } from "react";
 import { dish } from "../../Mock";
 import {
@@ -38,11 +34,6 @@ import Keyboard from "../../component/Keyboard";
 import Notepad from "./commponent/Notepad";
 import { useDispatch, useSelector } from "react-redux";
 import OptionsList from "./commponent/OptionsList";
-import {
-  addOrderItems,
-  changeOrderItems,
-  changeOrderType,
-} from "../../src/store/storeInfoSlice";
 
 const { confirm } = Modal;
 
@@ -121,7 +112,6 @@ const OrderPage = () => {
   // 尺寸计算结束执行
   useEffect(() => {
     if (pageIndex !== 0) {
-      console.log(pageIndex);
       paging();
     }
   }, [pageIndex]);
@@ -319,15 +309,28 @@ const OrderPage = () => {
     taxExempt: false,
   });
 
+  // 列表信息
+  const [orderListData, setOrderListData] = useState({
+    discount: 1,
+    tips: 0,
+    orderItem: [],
+  });
+
   /**
    * @description: 点击ok
    * @return {*}
    */
   const touchOK = () => {
-    dispatch(addOrderItems({ ...orderInfo, orderItemsOptions: orderListTemp }));
+    let temp = orderListData;
+    temp.orderItem.push({ ...orderInfo, orderItemsOptions: orderListTemp });
+    setOrderListData(JSON.parse(JSON.stringify(temp)));
     setOrderListTemp(JSON.parse(JSON.stringify([])));
     setDishShow(false);
   };
+
+  useEffect(() => {
+    console.log(orderListData);
+  }, [orderListData]);
 
   /**
    * @description: 修改大类信息
@@ -362,11 +365,7 @@ const OrderPage = () => {
    */
   const changeDishs = (item) => {
     let temp = item.items;
-    if (
-      JSON.stringify(temp) !== "[]" &&
-      temp[temp.length - 1].length === 1 &&
-      temp.length > 1
-    ) {
+    if (JSON.stringify(temp) !== "[]" && temp[temp.length - 1].length === 1 && temp.length > 1) {
       temp[temp.length - 2].push(temp[temp.length - 1][0]);
       temp.splice(-1, 1);
     }
@@ -416,6 +415,87 @@ const OrderPage = () => {
    */
   const [qty, setQty] = useState(false);
 
+  /**
+   * @description: 添加菜品
+   * @return {*}
+   */
+  const addOrder = () => {
+    let temp = orderListData;
+    if (notepadList[1] === undefined && JSON.stringify(temp.orderItem) !== "[]") {
+      temp.orderItem[notepadList[0]].quantity += 1;
+    }
+
+    if (notepadList[1] !== undefined && JSON.stringify(temp.orderItem) !== "[]") {
+      temp.orderItem[notepadList[0]].orderItemsOptions[notepadList[1]].quantity += 1;
+    }
+
+    setOrderListData(JSON.parse(JSON.stringify(temp)));
+  };
+
+  /**
+   * @description: 删除菜品
+   * @return {*}
+   */
+  const deleteOrder = () => {
+    let temp = orderListData;
+    if (notepadList[1] === undefined && JSON.stringify(temp.orderItem) !== "[]") {
+      if (temp.orderItem[notepadList[0]].quantity > 1) {
+        temp.orderItem[notepadList[0]].quantity -= 1;
+      } else {
+        temp.orderItem.splice(notepadList[0], 1);
+      }
+    }
+
+    if (notepadList[1] !== undefined && JSON.stringify(temp.orderItem) !== "[]") {
+      if (temp.orderItem[notepadList[0]].orderItemsOptions[notepadList[1]].quantity > 1) {
+        temp.orderItem[notepadList[0]].orderItemsOptions[notepadList[1]].quantity -= 1;
+      } else {
+        temp.orderItem[notepadList[0]].orderItemsOptions.splice(notepadList[1], 1);
+      }
+    }
+    setOrderListData(JSON.parse(JSON.stringify(temp)));
+  };
+
+  const [qtyNumbers, setQtyNumbers] = useState("0");
+
+  useEffect(() => {
+    qtyNumber();
+  }, [notepadList]);
+
+  /**
+   * @description: qty显示数量
+   * @return {*}
+   */
+  const qtyNumber = () => {
+    let temp = 0;
+    if (notepadList[1] === undefined && JSON.stringify(orderListData.orderItem) !== "[]") {
+      temp = orderListData.orderItem[notepadList[0]].quantity;
+    }
+
+    if (notepadList[1] !== undefined && JSON.stringify(orderListData.orderItem) !== "[]") {
+      temp = orderListData.orderItem[notepadList[0]].orderItemsOptions[notepadList[1]].quantity;
+    }
+    setQtyNumbers(temp.toString());
+  };
+
+  /**
+   * @description: 修改餐品数量
+   * @param {*} value 数量
+   * @return {*}
+   */
+  const changeOrderNumber = (value) => {
+    let temp = orderListData;
+    if (notepadList[1] === undefined && JSON.stringify(temp.orderItem) !== "[]") {
+      temp.orderItem[notepadList[0]].quantity = value;
+    }
+
+    if (notepadList[1] !== undefined && JSON.stringify(temp.orderItem) !== "[]") {
+      // console.log(orderListData.orderItem[notepadList[0]]);
+      temp.orderItem[notepadList[0]].orderItemsOptions[notepadList[1]].quantity = value;
+    }
+    setOrderListData(JSON.parse(JSON.stringify(temp)));
+  };
+
   return (
     <>
       <DishList
@@ -428,22 +508,20 @@ const OrderPage = () => {
         changeOrderInfo={changeOrderInfo}
         orderInfo={orderInfo}
       />
-      <div
-        style={{ display: "flex", flexDirection: "column", height: "100vh" }}
-      >
-        <div className="order-header">
-          <div className="order-header-title">Language</div>
-          <Earth color="#fff" />
+      <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
+        <div className='order-header'>
+          <div className='order-header-title'>Language</div>
+          <Earth color='#fff' />
         </div>
-        <div className="order-content">
-          <div className="order-box1">
-            <div className="order-box1-content">
-              <div className="order-content-title">Category</div>
-              <div className="order-content-category" ref={category}>
+        <div className='order-content'>
+          <div className='order-box1'>
+            <div className='order-box1-content'>
+              <div className='order-content-title'>Category</div>
+              <div className='order-content-category' ref={category}>
                 {pageNumber > 0 && (
                   <Button
-                    type="primary"
-                    className="order-content-category-btn"
+                    type='primary'
+                    className='order-content-category-btn'
                     onClick={() => {
                       setPageNumber((prve) => (prve -= 1));
                     }}
@@ -454,8 +532,8 @@ const OrderPage = () => {
 
                 {dishList[pageNumber]?.map((item, index) => (
                   <Button
-                    type="text"
-                    className="order-content-category-btn"
+                    type='text'
+                    className='order-content-category-btn'
                     key={index.toString()}
                     onClick={() => {
                       changeDishs(item);
@@ -466,8 +544,8 @@ const OrderPage = () => {
                 ))}
                 {dishList.length > pageNumber + 1 && (
                   <Button
-                    type="primary"
-                    className="order-content-category-btn"
+                    type='primary'
+                    className='order-content-category-btn'
                     onClick={() => {
                       setPageNumber((prve) => (prve += 1));
                     }}
@@ -477,13 +555,13 @@ const OrderPage = () => {
                 )}
               </div>
             </div>
-            <div className="order-box1-content">
-              <div className="order-content-title">Dishes</div>
-              <div className="order-content-category">
+            <div className='order-box1-content'>
+              <div className='order-content-title'>Dishes</div>
+              <div className='order-content-category'>
                 {dishNumber > 0 && (
                   <Button
-                    type="primary"
-                    className="order-content-category-btn"
+                    type='primary'
+                    className='order-content-category-btn'
                     onClick={() => {
                       setDishNumber((prve) => (prve -= 1));
                     }}
@@ -495,8 +573,8 @@ const OrderPage = () => {
                 {JSON.stringify(dishs) !== "[]" &&
                   dishs[dishNumber].map((item, index) => (
                     <Button
-                      type="text"
-                      className="order-content-category-btn"
+                      type='text'
+                      className='order-content-category-btn'
                       key={index.toString()}
                       onClick={() => {
                         setDishShow(true);
@@ -508,8 +586,8 @@ const OrderPage = () => {
 
                 {dishs.length > dishNumber + 1 && (
                   <Button
-                    type="primary"
-                    className="order-content-category-btn"
+                    type='primary'
+                    className='order-content-category-btn'
                     onClick={() => {
                       setDishNumber((prve) => (prve += 1));
                     }}
@@ -519,107 +597,72 @@ const OrderPage = () => {
                 )}
               </div>
             </div>
-            <div className="order-box1-bottom">
-              <Button className="order-box1-bottom-btn">Meat</Button>
-              <Button className="order-box1-bottom-btn">Vegetable</Button>
-              <Button className="order-box1-bottom-btn">Taste</Button>
-              <Button className="order-box1-bottom-btn">Others</Button>
+            <div className='order-box1-bottom'>
+              <Button className='order-box1-bottom-btn'>Meat</Button>
+              <Button className='order-box1-bottom-btn'>Vegetable</Button>
+              <Button className='order-box1-bottom-btn'>Taste</Button>
+              <Button className='order-box1-bottom-btn'>Others</Button>
             </div>
           </div>
 
-          <div className="order-box2">
-            <Notepad
-              orderList={orderList}
-              notepadList={notepadList}
-              setNotepadList={setNotepadList}
-            />
-            <div className="order-box2-sort">
-              <Button type="primary" className="order-box2-sort-btn">
+          <div className='order-box2'>
+            <Notepad orderListData={orderListData} notepadList={notepadList} setNotepadList={setNotepadList} />
+            <div className='order-box2-sort'>
+              <Button type='primary' className='order-box2-sort-btn'>
                 <Up />
                 <div>Up</div>
               </Button>
-              <Button
-                type="primary"
-                className="order-box2-sort-btn"
-                style={{ background: "#FFF", color: "#0076fe" }}
-              >
+              <Button type='primary' className='order-box2-sort-btn' style={{ background: "#FFF", color: "#0076fe" }}>
                 <Down />
                 <div>Down</div>
               </Button>
             </div>
-            <div className="order-box2-qty">
+            <div className='order-box2-qty'>
               <Popover
-                placement="leftBottom"
-                content={
-                  <ChangePrice
-                    type={"qty"}
-                    notepadList={notepadList}
-                    quit={setQty}
-                  />
-                }
-                trigger="click"
+                placement='leftBottom'
+                content={<ChangePrice type={"qty"} orderNumber={qtyNumbers} changeOrderNumber={changeOrderNumber} quit={setQty} />}
+                trigger='click'
                 open={qty}
                 onOpenChange={() => setQty((prev) => !prev)}
               >
-                <Button className="order-box2-qty-item">Qty</Button>
+                <Button className='order-box2-qty-item'>Qty</Button>
               </Popover>
               <Button
-                className="order-box2-qty-item"
+                className='order-box2-qty-item'
                 style={{ margin: "0 10px" }}
                 onClick={() => {
-                  dispatch(
-                    changeOrderItems({
-                      type: "reduce",
-                      data: notepadList,
-                      quantity: 1,
-                    })
-                  );
+                  deleteOrder();
                 }}
               >
                 <Subtract />
               </Button>
               <Button
-                className="order-box2-qty-item"
+                className='order-box2-qty-item'
                 onClick={() => {
-                  dispatch(
-                    changeOrderItems({
-                      type: "add",
-                      data: notepadList,
-                      quantity: 1,
-                    })
-                  );
+                  addOrder();
                 }}
               >
                 <Add />
               </Button>
             </div>
-            <div className="order-box2-qty">
-              <Button
-                className="order-box2-qty-item"
-                style={{ height: "auto" }}
-              >
+            <div className='order-box2-qty'>
+              <Button className='order-box2-qty-item' style={{ height: "auto" }}>
                 <Wallet />
                 <div>Payment</div>
               </Button>
-              <Button
-                className="order-box2-qty-item"
-                style={{ margin: "0 10px", height: "auto" }}
-              >
+              <Button className='order-box2-qty-item' style={{ margin: "0 10px", height: "auto" }}>
                 <Printer />
                 <div>Save</div>
               </Button>
-              <Button
-                className="order-box2-qty-item"
-                style={{ height: "auto" }}
-              >
+              <Button className='order-box2-qty-item' style={{ height: "auto" }}>
                 <Printer />
                 <div>Print</div>
               </Button>
             </div>
           </div>
-          <div className="order-box3">
+          <div className='order-box3'>
             <Button
-              className="order-box3-btn"
+              className='order-box3-btn'
               style={{ border: "1px solid #FE4A1B" }}
               onClick={() => {
                 navigate(-1);
@@ -628,15 +671,9 @@ const OrderPage = () => {
               <Quit />
               <div style={{ color: "#FE4A1B" }}>Quit</div>
             </Button>
-            <Popover
-              placement="leftTop"
-              content={<OrderType />}
-              trigger="click"
-              open={orderTypeShow}
-              onOpenChange={() => setOrderTypeShow((prev) => !prev)}
-            >
+            <Popover placement='leftTop' content={<OrderType />} trigger='click' open={orderTypeShow} onOpenChange={() => setOrderTypeShow((prev) => !prev)}>
               <Button
-                className="order-box3-btn"
+                className='order-box3-btn'
                 onClick={() => {
                   setCheckText("Order Type");
                 }}
@@ -644,11 +681,7 @@ const OrderPage = () => {
                   background: checkText === "Order Type" ? "#0076fe" : "#FFF",
                 }}
               >
-                {checkText === "Order Type" ? (
-                  <Type color={"#fff"} />
-                ) : (
-                  <Type color={"#0076fe"} />
-                )}
+                {checkText === "Order Type" ? <Type color={"#fff"} /> : <Type color={"#0076fe"} />}
                 <div
                   style={{
                     color: checkText === "Order Type" ? "#FFF" : "#0076fe",
@@ -658,38 +691,30 @@ const OrderPage = () => {
                 </div>
               </Button>
             </Popover>
-            <Popover
-              placement="left"
-              content={<SetTime setSetTimeShow={setSetTimeShow} />}
-              trigger="click"
-              open={setTimeShow}
-              onOpenChange={() => setSetTimeShow((prev) => !prev)}
+
+            <Button
+              className='order-box3-btn'
+              onClick={() => {
+                setCheckText("Set time");
+                setSetTimeShow(true);
+              }}
+              style={{
+                background: checkText === "Set time" ? "#0076fe" : "#FFF",
+              }}
             >
-              <Button
-                className="order-box3-btn"
-                onClick={() => {
-                  setCheckText("Set time");
-                }}
+              {checkText === "Set time" ? <Clock color={"#fff"} /> : <Clock color={"#0076fe"} />}
+              <div
                 style={{
-                  background: checkText === "Set time" ? "#0076fe" : "#FFF",
+                  color: checkText === "Set time" ? "#FFF" : "#0076fe",
                 }}
               >
-                {checkText === "Set time" ? (
-                  <Clock color={"#fff"} />
-                ) : (
-                  <Clock color={"#0076fe"} />
-                )}
-                <div
-                  style={{
-                    color: checkText === "Set time" ? "#FFF" : "#0076fe",
-                  }}
-                >
-                  Set time
-                </div>
-              </Button>
-            </Popover>
+                Set time
+              </div>
+            </Button>
+            <SetTime setTimeShow={setTimeShow} setSetTimeShow={setSetTimeShow} />
+
             <Button
-              className="order-box3-btn"
+              className='order-box3-btn'
               onClick={() => {
                 setCheckText("Set price");
               }}
@@ -697,11 +722,7 @@ const OrderPage = () => {
                 background: checkText === "Set price" ? "#0076fe" : "#FFF",
               }}
             >
-              {checkText === "Set price" ? (
-                <Price color={"#fff"} />
-              ) : (
-                <Price color={"#0076fe"} />
-              )}
+              {checkText === "Set price" ? <Price color={"#fff"} /> : <Price color={"#0076fe"} />}
               <div
                 style={{
                   color: checkText === "Set price" ? "#FFF" : "#0076fe",
@@ -710,15 +731,9 @@ const OrderPage = () => {
                 Set price
               </div>
             </Button>
-            <Popover
-              placement="left"
-              content={<SelfInput setSelfInputShow={setSelfInputShow} />}
-              trigger="click"
-              open={selfInputShow}
-              onOpenChange={() => setSelfInputShow((prev) => !prev)}
-            >
+            <Popover placement='left' content={<SelfInput setSelfInputShow={setSelfInputShow} />} trigger='click' open={selfInputShow} onOpenChange={() => setSelfInputShow((prev) => !prev)}>
               <Button
-                className="order-box3-btn"
+                className='order-box3-btn'
                 onClick={() => {
                   setCheckText("Self Input");
                 }}
@@ -726,11 +741,7 @@ const OrderPage = () => {
                   background: checkText === "Self Input" ? "#0076fe" : "#FFF",
                 }}
               >
-                {checkText === "Self Input" ? (
-                  <File color={"#fff"} />
-                ) : (
-                  <File color={"#0076fe"} />
-                )}
+                {checkText === "Self Input" ? <File color={"#fff"} /> : <File color={"#0076fe"} />}
                 <div
                   style={{
                     color: checkText === "Self Input" ? "#FFF" : "#0076fe",
@@ -741,7 +752,7 @@ const OrderPage = () => {
               </Button>
             </Popover>
             <Button
-              className="order-box3-btn"
+              className='order-box3-btn'
               onClick={() => {
                 setCheckText("Split Check");
                 SplitCheck();
@@ -750,11 +761,7 @@ const OrderPage = () => {
                 background: checkText === "Split Check" ? "#0076fe" : "#FFF",
               }}
             >
-              {checkText === "Split Check" ? (
-                <Split color={"#fff"} />
-              ) : (
-                <Split color={"#0076fe"} />
-              )}
+              {checkText === "Split Check" ? <Split color={"#fff"} /> : <Split color={"#0076fe"} />}
               <div
                 style={{
                   color: checkText === "Split Check" ? "#FFF" : "#0076fe",
@@ -764,14 +771,14 @@ const OrderPage = () => {
               </div>
             </Button>
             <Popover
-              placement="leftBottom"
+              placement='leftBottom'
               content={<ChangePrice type={"discount"} quit={setDiscountShow} />}
-              trigger="click"
+              trigger='click'
               open={discountShow}
               onOpenChange={() => setDiscountShow((prev) => !prev)}
             >
               <Button
-                className="order-box3-btn"
+                className='order-box3-btn'
                 onClick={() => {
                   setCheckText("Discount");
                 }}
@@ -779,11 +786,7 @@ const OrderPage = () => {
                   background: checkText === "Discount" ? "#0076fe" : "#FFF",
                 }}
               >
-                {checkText === "Discount" ? (
-                  <Discount color={"#fff"} />
-                ) : (
-                  <Discount color={"#0076fe"} />
-                )}
+                {checkText === "Discount" ? <Discount color={"#fff"} /> : <Discount color={"#0076fe"} />}
                 <div
                   style={{
                     color: checkText === "Discount" ? "#FFF" : "#0076fe",
@@ -793,15 +796,9 @@ const OrderPage = () => {
                 </div>
               </Button>
             </Popover>
-            <Popover
-              placement="leftBottom"
-              content={<ChangePrice type={"tips"} quit={setTipsShow} />}
-              trigger="click"
-              open={tipsShow}
-              onOpenChange={() => setTipsShow((prev) => !prev)}
-            >
+            <Popover placement='leftBottom' content={<ChangePrice type={"tips"} quit={setTipsShow} />} trigger='click' open={tipsShow} onOpenChange={() => setTipsShow((prev) => !prev)}>
               <Button
-                className="order-box3-btn"
+                className='order-box3-btn'
                 onClick={() => {
                   setCheckText("Tips");
                 }}
@@ -809,16 +806,8 @@ const OrderPage = () => {
                   background: checkText === "Tips" ? "#0076fe" : "#FFF",
                 }}
               >
-                {checkText === "Tips" ? (
-                  <Tips color={"#fff"} />
-                ) : (
-                  <Tips color={"#0076fe"} />
-                )}
-                <div
-                  style={{ color: checkText === "Tips" ? "#FFF" : "#0076fe" }}
-                >
-                  Tips
-                </div>
+                {checkText === "Tips" ? <Tips color={"#fff"} /> : <Tips color={"#0076fe"} />}
+                <div style={{ color: checkText === "Tips" ? "#FFF" : "#0076fe" }}>Tips</div>
               </Button>
             </Popover>
           </div>
@@ -844,10 +833,8 @@ const OrderType = () => {
     <div style={{ padding: 20 }}>
       <div>
         <Button
-          className="orderType-btn"
-          onClick={() => {
-            dispatch(changeOrderType("Walk In"));
-          }}
+          className='orderType-btn'
+          onClick={() => {}}
           style={{
             background: orderType === "Walk In" ? "#0076fe" : "#FFF",
             color: orderType === "Walk In" ? "#fff" : "#0076fe",
@@ -856,19 +843,13 @@ const OrderType = () => {
           <Pedestrian color={orderType === "Walk In" ? "#fff" : "#0076fe"} />
           <div>Walk In</div>
         </Button>
-        <Button
-          className="orderType-btn"
-          style={{ margin: "0 10px" }}
-          onClick={() => {}}
-        >
+        <Button className='orderType-btn' style={{ margin: "0 10px" }} onClick={() => {}}>
           <DineIn color={"#0076fe"} />
           <div>Dine In</div>
         </Button>
         <Button
-          className="orderType-btn"
-          onClick={() => {
-            dispatch(changeOrderType("Pick Up"));
-          }}
+          className='orderType-btn'
+          onClick={() => {}}
           style={{
             background: orderType === "Pick Up" ? "#0076fe" : "#FFF",
             color: orderType === "Pick Up" ? "#fff" : "#0076fe",
@@ -880,20 +861,18 @@ const OrderType = () => {
       </div>
       <div style={{ marginTop: 10 }}>
         <Button
-          className="orderType-btn"
+          className='orderType-btn'
           style={{
             marginRight: 10,
             background: orderType === "Delivery" ? "#0076fe" : "#FFF",
             color: orderType === "Delivery" ? "#fff" : "#0076fe",
           }}
-          onClick={() => {
-            dispatch(changeOrderType("Delivery"));
-          }}
+          onClick={() => {}}
         >
           <ElectricCar color={orderType === "Delivery" ? "#fff" : "#0076fe"} />
           <div>Delivery</div>
         </Button>
-        <Button className="orderType-btn" onClick={() => {}}>
+        <Button className='orderType-btn' onClick={() => {}}>
           <UserSetting color={"#0076fe"} />
           <div>Buffet</div>
         </Button>
@@ -902,141 +881,182 @@ const OrderType = () => {
   );
 };
 
-const week = [
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "1",
-  "2",
-  "3",
-  "4",
-  "5",
-  "6",
-  "7",
-  "8",
-  "9",
-  "10",
-  "11",
-  "12",
-  "13",
-  "14",
-  "15",
-  "16",
-  "17",
-  "18",
-  "19",
-  "20",
-  "21",
-  "22",
-  "23",
-  "24",
-  "25",
-  "26",
-  "27",
-  "28",
-  "29",
-  "30",
-  "31",
-  "",
-  "",
-  "",
-  "",
-  "",
-];
-
 /**
  * @description: 日历切换
  * @return {*}
  */
-const SetTime = ({ setSetTimeShow }) => {
-  const onPanelChange = (value, mode) => {
-    console.log(value.format("YYYY-MM-DD"), mode);
+const SetTime = ({ setSetTimeShow, setTimeShow }) => {
+  const onPanelChange = (value) => {
+    console.log(value.format("YYYY-MM-DD"));
   };
-  return (
-    <div className="setTime">
-      <div className="setTime-title">
-        <div className="setTime-title-time">
-          2022年10月
-          <div className="setTime-Dropdown">
-            <Dropdown overlay={<SetTimeHour />} placement="bottom" arrow>
-              <Button>23</Button>
-            </Dropdown>
-            :
-            <Dropdown overlay={<SetTimeHour />} placement="bottom" arrow>
-              <Button>23</Button>
-            </Dropdown>
-          </div>
-        </div>
-        <div>
-          <Button>上个月</Button>
-          <Button>下个月</Button>
-        </div>
-      </div>
-      <div className="setTime-calendar">
-        <Calendar
-          fullscreen={false}
-          onPanelChange={onPanelChange}
-          style={{ width: 450 }}
-        />
-        <div className="setTime-calendar-btn">
-          <div className="setTime-calendar-btn">
-            <Button className="setTime-calendar-btn-item">
-              <CalendarSvg />
-              <div style={{ marginLeft: 8 }}>Now</div>
-            </Button>
-            <Button
-              className="setTime-calendar-btn-item"
-              style={{ marginLeft: 10 }}
-            >
-              <RefuseBin color={"#0076fe"} />
-              <div style={{ marginLeft: 8 }}>Clear</div>
-            </Button>
-          </div>
-          <div className="setTime-calendar-btn">
-            <Button className="setTime-calendar-btn-item">
-              <Save />
-              <div style={{ marginLeft: 8 }}>Save</div>
-            </Button>
-            <Button
-              className="setTime-calendar-btn-item"
-              style={{
-                marginLeft: 10,
-                border: "1px solid #FE4A1B",
-                color: "#FE4A1B",
-              }}
-              onClick={() => setSetTimeShow((prev) => !prev)}
-            >
-              <Quit />
-              <div style={{ marginLeft: 8 }}>退出</div>
-            </Button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
 
-/**
- * @description:设置时间
- * @return {*}
- */
-const SetTimeHour = () => {
+  const [hour, setHour] = useState("00");
+
+  const [min, setMin] = useState("00");
+
+  const changeNow = () => {};
+
   return (
-    <Menu
-      items={[
-        {
-          key: "1",
-          label: <Button>23</Button>,
-        },
-        {
-          key: "2",
-          label: <Button>10</Button>,
-        },
+    <Modal
+      title='Set Time'
+      open={setTimeShow}
+      onOk={() => setSetTimeShow(false)}
+      onCancel={() => setSetTimeShow(false)}
+      centered
+      footer={[
+        <div style={{ display: "flex", flex: 1, justifyContent: "space-between" }} key={"box"}>
+          <div>
+            <Button
+              type='primary'
+              onClick={() => {
+                changeNow();
+              }}
+            >
+              Now
+            </Button>
+            <Button type='primary'>Clear</Button>
+          </div>
+          <div>
+            <Button type='primary'>Save</Button>
+            <Button type='primary'>Quit</Button>
+          </div>
+        </div>,
       ]}
-    />
+    >
+      <Calendar
+        fullscreen={false}
+        headerRender={({ value, type, onChange, onTypeChange }) => {
+          const start = 0;
+          const end = 12;
+          const monthOptions = [];
+          const current = value.clone();
+          const localeData = value.localeData();
+          const months = [];
+          for (let i = 0; i < 12; i++) {
+            current.month(i);
+            months.push(localeData.monthsShort(current));
+          }
+          for (let i = start; i < end; i++) {
+            monthOptions.push(
+              <Select.Option key={`month-${i}`} value={i} className='month-item'>
+                {months[i]}
+              </Select.Option>
+            );
+          }
+          const year = value.year();
+          const month = value.month();
+          const options = [];
+          for (let i = year - 10; i < year + 10; i += 1) {
+            options.push(
+              <Select.Option key={`year-${i}`} value={i} className='year-item'>
+                {i}
+              </Select.Option>
+            );
+          }
+
+          const defHour = 23;
+          const hourOption = [];
+          for (let i = 0; i <= defHour; i += 1) {
+            hourOption.push(
+              <Select.Option key={`hour-${i}`} value={i} className='year-item'>
+                {i < 10 ? `0${i}` : i}
+              </Select.Option>
+            );
+          }
+
+          const changeNewHour = (value) => {
+            setHour(value);
+          };
+
+          const defMin = 59;
+          const minOption = [];
+          for (let i = 0; i <= defMin; i++) {
+            minOption.push(
+              <Select.Option key={`min-${i}`} value={i} className='year-item'>
+                {i < 10 ? `0${i}` : i}
+              </Select.Option>
+            );
+          }
+
+          const changeMin = (value) => {
+            setMin(value);
+          };
+
+          return (
+            <div
+              style={{
+                paddingBottom: 8,
+              }}
+            >
+              <Row gutter={8} justify='space-around' align='middle'>
+                <Col>
+                  <Radio.Group size='small' onChange={(e) => onTypeChange(e.target.value)} value={type}>
+                    <Radio.Button value='month'>Month</Radio.Button>
+                    <Radio.Button value='year'>Year</Radio.Button>
+                  </Radio.Group>
+                </Col>
+                <Col>
+                  <Select
+                    size='small'
+                    dropdownMatchSelectWidth={false}
+                    className='my-year-select'
+                    value={year}
+                    onChange={(newYear) => {
+                      const now = value.clone().year(newYear);
+                      onChange(now);
+                    }}
+                  >
+                    {options}
+                  </Select>
+                </Col>
+                <Col>
+                  <Select
+                    size='small'
+                    dropdownMatchSelectWidth={false}
+                    value={month}
+                    onChange={(newMonth) => {
+                      const now = value.clone().month(newMonth);
+                      onChange(now);
+                    }}
+                  >
+                    {monthOptions}
+                  </Select>
+                </Col>
+                <Col>设置时间：</Col>
+                <Col>
+                  <Select
+                    size='small'
+                    dropdownMatchSelectWidth={false}
+                    value={hour}
+                    onChange={(newHour) => {
+                      changeNewHour(newHour);
+                    }}
+                  >
+                    {hourOption}
+                  </Select>
+                </Col>
+                <Col>
+                  <Select
+                    size='small'
+                    dropdownMatchSelectWidth={false}
+                    value={min}
+                    onChange={(newMin) => {
+                      changeMin(newMin);
+                    }}
+                  >
+                    {minOption}
+                  </Select>
+                </Col>
+              </Row>
+            </div>
+          );
+        }}
+        // onPanelChange={(value, mode) => onPanelChange(value, mode)}
+        onChange={(value) => {
+          onPanelChange(value);
+        }}
+      />
+    </Modal>
   );
 };
 
@@ -1052,13 +1072,13 @@ const SelfInput = ({ setSelfInputShow }) => {
   const [distinguish, setDistinguish] = useState("name");
 
   return (
-    <div className="selfInput">
-      <div className="selfInput-content">
-        <div className="selfInput-content-left">
-          <div className="selfInput-content-left-item">
+    <div className='selfInput'>
+      <div className='selfInput-content'>
+        <div className='selfInput-content-left'>
+          <div className='selfInput-content-left-item'>
             <div style={{ minWidth: 70 }}>Name:</div>
             <Input
-              className="selfInput-content-left-item-input"
+              className='selfInput-content-left-item-input'
               value={name}
               onClick={() => {
                 setDistinguish("name");
@@ -1068,10 +1088,10 @@ const SelfInput = ({ setSelfInputShow }) => {
               }}
             />
           </div>
-          <div className="selfInput-content-left-item">
+          <div className='selfInput-content-left-item'>
             <div style={{ minWidth: 70 }}>Price:</div>
             <Input
-              className="selfInput-content-left-item-input"
+              className='selfInput-content-left-item-input'
               value={price}
               onClick={() => {
                 setDistinguish("price");
@@ -1081,8 +1101,8 @@ const SelfInput = ({ setSelfInputShow }) => {
               }}
             />
             <Button
-              type="primary"
-              className="selfInput-content-left-item-btn"
+              type='primary'
+              className='selfInput-content-left-item-btn'
               onClick={() => {
                 setPrice((prev) => (prev += 3));
                 setDistinguish("price");
@@ -1091,8 +1111,8 @@ const SelfInput = ({ setSelfInputShow }) => {
               3.00
             </Button>
             <Button
-              type="primary"
-              className="selfInput-content-left-item-btn"
+              type='primary'
+              className='selfInput-content-left-item-btn'
               onClick={() => {
                 setPrice((prev) => (prev += 4));
                 setDistinguish("price");
@@ -1101,10 +1121,10 @@ const SelfInput = ({ setSelfInputShow }) => {
               4.00
             </Button>
           </div>
-          <div className="selfInput-content-left-item">
+          <div className='selfInput-content-left-item'>
             <div style={{ minWidth: 70 }}>Quantitly:</div>
             <Input
-              className="selfInput-content-left-item-input"
+              className='selfInput-content-left-item-input'
               value={quantitly}
               onClick={() => {
                 setDistinguish("quantitly");
@@ -1114,8 +1134,8 @@ const SelfInput = ({ setSelfInputShow }) => {
               }}
             />
             <Button
-              type="primary"
-              className="selfInput-content-left-item-btn"
+              type='primary'
+              className='selfInput-content-left-item-btn'
               onClick={() => {
                 setQuantitly((prev) => (prev += 3));
                 setDistinguish("quantitly");
@@ -1124,8 +1144,8 @@ const SelfInput = ({ setSelfInputShow }) => {
               3.00
             </Button>
             <Button
-              type="primary"
-              className="selfInput-content-left-item-btn"
+              type='primary'
+              className='selfInput-content-left-item-btn'
               onClick={() => {
                 setQuantitly((prev) => (prev += 4));
                 setDistinguish("quantitly");
@@ -1135,47 +1155,36 @@ const SelfInput = ({ setSelfInputShow }) => {
             </Button>
           </div>
         </div>
-        <div className="selfInput-content-right">
+        <div className='selfInput-content-right'>
           <div style={{ minWidth: 70 }}>Print to:</div>
-          <div className="selfInput-content-right-box">
-            <div className="selfInput-content-right-printer">
-              <div className="selfInput-content-right-printer-item">
+          <div className='selfInput-content-right-box'>
+            <div className='selfInput-content-right-printer'>
+              <div className='selfInput-content-right-printer-item'>
                 <Printer color={"#333"} />
                 <div style={{ marginLeft: 8 }}>Printer No.1</div>
               </div>
-              <div className="selfInput-content-right-printer-item">
+              <div className='selfInput-content-right-printer-item'>
                 <Printer color={"#333"} />
                 <div style={{ marginLeft: 8 }}>Printer No.1</div>
               </div>
             </div>
             <div style={{ marginTop: 10 }}>
-              <Button className="selfInput-content-right-btn">Up</Button>
-              <Button
-                className="selfInput-content-right-btn"
-                style={{ marginLeft: 8 }}
-              >
+              <Button className='selfInput-content-right-btn'>Up</Button>
+              <Button className='selfInput-content-right-btn' style={{ marginLeft: 8 }}>
                 Down
               </Button>
             </div>
           </div>
         </div>
       </div>
-      <Keyboard
-        changeText={
-          distinguish === "name"
-            ? setName
-            : distinguish === "price"
-            ? setPrice
-            : setQuantitly
-        }
-      />
-      <div className="selfInput-btn">
-        <Button className="selfInput-btn-item">
+      <Keyboard changeText={distinguish === "name" ? setName : distinguish === "price" ? setPrice : setQuantitly} />
+      <div className='selfInput-btn'>
+        <Button className='selfInput-btn-item'>
           <Save />
           Save
         </Button>
         <Button
-          className="selfInput-btn-item"
+          className='selfInput-btn-item'
           style={{
             border: "1px solid #FE4A1B",
             color: "#FE4A1B",
@@ -1210,16 +1219,7 @@ const SplitCheck = () => {
   });
 };
 
-const DishList = ({
-  dishShow,
-  touchOK,
-  touchCancel,
-  mock,
-  orderListTemp,
-  setOrderListTemp,
-  changeOrderInfo,
-  orderInfo,
-}) => {
+const DishList = ({ dishShow, touchOK, touchCancel, mock, orderListTemp, setOrderListTemp, changeOrderInfo, orderInfo }) => {
   const [price, setPrice] = useState(0);
 
   // useEffect(() => {
@@ -1343,10 +1343,7 @@ const DishList = ({
       onOk={touchOK}
       centered
       footer={[
-        <div
-          key="dish"
-          style={{ display: "flex", alignItems: "center", marginRight: 10 }}
-        >
+        <div key='dish' style={{ display: "flex", alignItems: "center", marginRight: 10 }}>
           <MinusCircleOutlined
             style={{ fontSize: 20 }}
             onClick={() => {
@@ -1355,7 +1352,7 @@ const DishList = ({
               }
             }}
           />
-          <div className="dishList-number">{orderInfo.quantity}</div>
+          <div className='dishList-number'>{orderInfo.quantity}</div>
           <PlusCircleOutlined
             style={{ fontSize: 20 }}
             onClick={() => {
@@ -1364,12 +1361,7 @@ const DishList = ({
           />
         </div>,
         // <Button key='OK' type='primary' onClick={touchOK} style={{ fontWeight: "bold" }}>
-        <Button
-          key="OK"
-          type="primary"
-          onClick={submit}
-          style={{ fontWeight: "bold" }}
-        >
+        <Button key='OK' type='primary' onClick={submit} style={{ fontWeight: "bold" }}>
           ${price.toFixed(2)} - Add to cart
         </Button>,
       ]}
