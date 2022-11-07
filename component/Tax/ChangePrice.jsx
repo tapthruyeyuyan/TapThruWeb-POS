@@ -7,9 +7,7 @@ import { changeDiscount, changeTips } from "../../src/store/storeInfoSlice";
 
 const { Search } = Input;
 
-const ChangePrice = ({ type, orderNumber, quit, changeOrderNumber }) => {
-  const dispatch = useDispatch();
-
+const ChangePrice = ({ type, orderNumber, quit, save, setFun }) => {
   /**
    * @description: 点击删除
    * @return {*}
@@ -22,11 +20,17 @@ const ChangePrice = ({ type, orderNumber, quit, changeOrderNumber }) => {
    * @description: 设置输入框文字
    * @return {*}
    */
-  const [inputValue, setInputValue] = useState(orderNumber ? orderNumber : "");
+  const [inputValue, setInputValue] = useState("");
 
   useEffect(() => {
-    setInputValue(orderNumber ? orderNumber : "");
+    setInputValue(orderNumber ? orderNumber.toString() : "");
   }, [orderNumber]);
+
+  useEffect(() => {
+    if (setFun !== undefined) {
+      setFun(inputValue);
+    }
+  }, [inputValue]);
 
   /**
    * @description: 键盘
@@ -114,55 +118,55 @@ const ChangePrice = ({ type, orderNumber, quit, changeOrderNumber }) => {
           )}
         </div>
       </div>
-      <div className='price-right'>
-        {type !== "qty" && (
+      {type !== "splitCheck" && (
+        <div className='price-right'>
+          {type !== "qty" && (
+            <div>
+              <div>Tax rate</div>
+              <div className='price-right-title'>8.000%</div>
+            </div>
+          )}
           <div>
-            <div>Tax rate</div>
-            <div className='price-right-title'>8.000%</div>
+            <Button
+              className='price-right-btn'
+              onClick={() => {
+                save(Number(inputValue));
+
+                quit((prev) => (prev = false));
+
+                // if (type === "tips") {
+                //   dispatch(changeTips(Number(inputValue)));
+                //   quit((prev) => (prev = false));
+                // }
+
+                // if (type === "discount") {
+                //   dispatch(changeDiscount(Number(inputValue)));
+                //   quit((prev) => (prev = false));
+                // }
+
+                setInputValue("");
+              }}
+            >
+              <Save />
+              <div>Save</div>
+            </Button>
+            <Button
+              className='price-right-btn'
+              style={{
+                marginTop: 20,
+                border: "1px solid #FE4A1B",
+                color: "#FE4A1B",
+              }}
+              onClick={() => {
+                quit((prev) => (prev = false));
+              }}
+            >
+              <Quit />
+              <div>Quit</div>
+            </Button>
           </div>
-        )}
-        <div>
-          <Button
-            className='price-right-btn'
-            onClick={() => {
-              if (type === "qty") {
-                // dispatch(changeOrderItems({ type: symbol, data: notepadList, quantity: Number(inputValue) }));
-                changeOrderNumber(Number(inputValue));
-                quit((prev) => (prev = false));
-              }
-
-              if (type === "tips") {
-                dispatch(changeTips(Number(inputValue)));
-                quit((prev) => (prev = false));
-              }
-
-              if (type === "discount") {
-                dispatch(changeDiscount(Number(inputValue)));
-                quit((prev) => (prev = false));
-              }
-
-              setInputValue("");
-            }}
-          >
-            <Save />
-            <div>Save</div>
-          </Button>
-          <Button
-            className='price-right-btn'
-            style={{
-              marginTop: 20,
-              border: "1px solid #FE4A1B",
-              color: "#FE4A1B",
-            }}
-            onClick={() => {
-              quit((prev) => (prev = false));
-            }}
-          >
-            <Quit />
-            <div>Quit</div>
-          </Button>
         </div>
-      </div>
+      )}
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import { Button, Popover, Menu, Modal, Calendar, Col, Radio, Row, Select, Typography } from "antd";
+import { Button, Popover, Modal, Calendar, Col, Radio, Row, Select, message, Input } from "antd";
 import { ExclamationCircleOutlined, MinusCircleOutlined, PlusCircleOutlined } from "@ant-design/icons";
 import React, { useEffect, useRef, useState } from "react";
 import { dish } from "../../Mock";
@@ -29,11 +29,13 @@ import {
 } from "../../component/Svg/Svg";
 import "./OrderPage.less";
 import ChangePrice from "../../component/Tax/ChangePrice";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Keyboard from "../../component/Keyboard";
 import Notepad from "./commponent/Notepad";
 import { useDispatch, useSelector } from "react-redux";
 import OptionsList from "./commponent/OptionsList";
+import { changeOrderList } from "../../src/store/storeInfoSlice";
+import produce from "immer";
 
 const { confirm } = Modal;
 
@@ -47,8 +49,6 @@ const OrderPage = () => {
 
   const dispatch = useDispatch();
 
-  const orderList = useSelector((state) => state.orderList);
-
   // 菜单列表
   const [dishList, setDishList] = useState([]);
 
@@ -57,6 +57,12 @@ const OrderPage = () => {
 
   // 菜单页数
   const [dishNumber, setDishNumber] = useState(0);
+
+  // 是否保存了
+  const [saveState, setSaveState] = useState(true);
+
+  // 获取当前路径
+  const params = useParams();
 
   /**
    * @description: 分页
@@ -289,7 +295,7 @@ const OrderPage = () => {
    * @description: 提交信息
    * @return {*}
    */
-  const [orderInfo, setOrderInfo] = useState({
+  let orderInfo = {
     restaurantInfoId: mock.restaurantInfoId,
     quantity: 1,
     name: mock.name,
@@ -307,12 +313,15 @@ const OrderPage = () => {
       price: mock.price,
     },
     taxExempt: false,
-  });
+  };
 
   // 列表信息
   const [orderListData, setOrderListData] = useState({
+    orderType: params.type,
     discount: 1,
     tips: 0,
+    setTime: null,
+    id: 1,
     orderItem: [],
   });
 
@@ -321,11 +330,14 @@ const OrderPage = () => {
    * @return {*}
    */
   const touchOK = () => {
-    let temp = orderListData;
-    temp.orderItem.push({ ...orderInfo, orderItemsOptions: orderListTemp });
-    setOrderListData(JSON.parse(JSON.stringify(temp)));
+    setOrderListData(
+      produce((draft) => {
+        draft.orderItem.push({ ...orderInfo, orderItemsOptions: orderListTemp });
+      })
+    );
     setOrderListTemp(JSON.parse(JSON.stringify([])));
     setDishShow(false);
+    setSaveState(false);
   };
 
   useEffect(() => {
@@ -338,15 +350,14 @@ const OrderPage = () => {
    * @return {*}
    */
   const changeOrderInfo = (type) => {
-    let temp = orderInfo;
-    if (type === "add") {
-      temp.quantity += 1;
-    }
-    if (type === "reduce") {
-      temp.quantity -= 1;
-    }
-
-    setOrderInfo(JSON.parse(JSON.stringify(temp)));
+    produce((draft) => {
+      if (type === "add") {
+        draft.quantity += 1;
+      }
+      if (type === "reduce") {
+        draft.quantity -= 1;
+      }
+    });
   };
 
   /**
@@ -392,6 +403,12 @@ const OrderPage = () => {
   const [setTimeShow, setSetTimeShow] = useState(false);
 
   /**
+   * @description: setPrice 显示隐藏
+   * @return {*}
+   */
+  const [setPriceShow, setSetPriceShow] = useState(false);
+
+  /**
    * @description: selfInput 显示隐藏
    * @return {*}
    */
@@ -420,16 +437,19 @@ const OrderPage = () => {
    * @return {*}
    */
   const addOrder = () => {
-    let temp = orderListData;
-    if (notepadList[1] === undefined && JSON.stringify(temp.orderItem) !== "[]") {
-      temp.orderItem[notepadList[0]].quantity += 1;
+    if (JSON.stringify(orderListData.orderItem) !== "[]") {
+      setOrderListData(
+        produce((draft) => {
+          if (notepadList[1] === undefined) {
+            draft.orderItem[notepadList[0]].quantity += 1;
+          }
+          if (notepadList[1] !== undefined) {
+            draft.orderItem[notepadList[0]].orderItemsOptions[notepadList[1]].quantity += 1;
+          }
+        })
+      );
     }
-
-    if (notepadList[1] !== undefined && JSON.stringify(temp.orderItem) !== "[]") {
-      temp.orderItem[notepadList[0]].orderItemsOptions[notepadList[1]].quantity += 1;
-    }
-
-    setOrderListData(JSON.parse(JSON.stringify(temp)));
+    setSaveState(false);
   };
 
   /**
@@ -437,30 +457,36 @@ const OrderPage = () => {
    * @return {*}
    */
   const deleteOrder = () => {
-    let temp = orderListData;
-    if (notepadList[1] === undefined && JSON.stringify(temp.orderItem) !== "[]") {
-      if (temp.orderItem[notepadList[0]].quantity > 1) {
-        temp.orderItem[notepadList[0]].quantity -= 1;
-      } else {
-        temp.orderItem.splice(notepadList[0], 1);
-      }
+    if (JSON.stringify(orderListData.orderItem) !== "[]") {
+      setOrderListData(
+        produce((draft) => {
+          if (notepadList[1] === undefined) {
+            if (draft.orderItem[notepadList[0]].quantity > 1) {
+              draft.orderItem[notepadList[0]].quantity -= 1;
+            } else {
+              draft.orderItem.splice(notepadList[0], 1);
+              setNotepadList([0]);
+            }
+          }
+          if (notepadList[1] !== undefined) {
+            if (draft.orderItem[notepadList[0]].orderItemsOptions[notepadList[1]].quantity > 1) {
+              draft.orderItem[notepadList[0]].orderItemsOptions[notepadList[1]].quantity -= 1;
+            } else {
+              draft.orderItem[notepadList[0]].orderItemsOptions.splice(notepadList[1], 1);
+              setNotepadList([0]);
+            }
+          }
+        })
+      );
     }
-
-    if (notepadList[1] !== undefined && JSON.stringify(temp.orderItem) !== "[]") {
-      if (temp.orderItem[notepadList[0]].orderItemsOptions[notepadList[1]].quantity > 1) {
-        temp.orderItem[notepadList[0]].orderItemsOptions[notepadList[1]].quantity -= 1;
-      } else {
-        temp.orderItem[notepadList[0]].orderItemsOptions.splice(notepadList[1], 1);
-      }
-    }
-    setOrderListData(JSON.parse(JSON.stringify(temp)));
+    setSaveState(false);
   };
 
   const [qtyNumbers, setQtyNumbers] = useState("0");
 
   useEffect(() => {
     qtyNumber();
-  }, [notepadList]);
+  }, [notepadList, orderListData]);
 
   /**
    * @description: qty显示数量
@@ -484,16 +510,48 @@ const OrderPage = () => {
    * @return {*}
    */
   const changeOrderNumber = (value) => {
-    let temp = orderListData;
-    if (notepadList[1] === undefined && JSON.stringify(temp.orderItem) !== "[]") {
-      temp.orderItem[notepadList[0]].quantity = value;
+    if (JSON.stringify(orderListData.orderItem) !== "[]") {
+      setOrderListData(
+        produce((draft) => {
+          if (notepadList[1] === undefined) {
+            draft.orderItem[notepadList[0]].quantity = value;
+          }
+          if (notepadList[1] !== undefined) {
+            draft.orderItem[notepadList[0]].orderItemsOptions[notepadList[1]].quantity = value;
+          }
+        })
+      );
     }
+  };
 
-    if (notepadList[1] !== undefined && JSON.stringify(temp.orderItem) !== "[]") {
-      // console.log(orderListData.orderItem[notepadList[0]]);
-      temp.orderItem[notepadList[0]].orderItemsOptions[notepadList[1]].quantity = value;
-    }
-    setOrderListData(JSON.parse(JSON.stringify(temp)));
+  /**
+   * @description: 设置时间
+   * @param {*} time  时间
+   * @return {*}
+   */
+  const changeOrderTime = (time) => {
+    setOrderListData({ ...orderListData, setTime: time });
+    setSaveState(false);
+  };
+
+  /**
+   * @description: 修改折扣
+   * @param {*} value 折扣值
+   * @return {*}
+   */
+  const changeDiscount = (value) => {
+    setOrderListData({ ...orderListData, discount: value });
+    setSaveState(false);
+  };
+
+  /**
+   * @description: 修改小费
+   * @param {*} value 小费值
+   * @return {*}
+   */
+  const changeTip = (value) => {
+    setOrderListData({ ...orderListData, tips: value });
+    setSaveState(false);
   };
 
   return (
@@ -620,7 +678,7 @@ const OrderPage = () => {
             <div className='order-box2-qty'>
               <Popover
                 placement='leftBottom'
-                content={<ChangePrice type={"qty"} orderNumber={qtyNumbers} changeOrderNumber={changeOrderNumber} quit={setQty} />}
+                content={<ChangePrice type={"qty"} orderNumber={qtyNumbers} save={changeOrderNumber} quit={setQty} />}
                 trigger='click'
                 open={qty}
                 onOpenChange={() => setQty((prev) => !prev)}
@@ -650,7 +708,19 @@ const OrderPage = () => {
                 <Wallet />
                 <div>Payment</div>
               </Button>
-              <Button className='order-box2-qty-item' style={{ margin: "0 10px", height: "auto" }}>
+              <Button
+                className='order-box2-qty-item'
+                style={{ margin: "0 10px", height: "auto" }}
+                onClick={() => {
+                  if (JSON.stringify(orderListData.orderItem) !== "[]") {
+                    dispatch(changeOrderList({ ...orderListData }));
+                    message.success("Save successfully");
+                    setSaveState(true);
+                  } else {
+                    message.error("Please select the dishes before saving");
+                  }
+                }}
+              >
                 <Printer />
                 <div>Save</div>
               </Button>
@@ -665,13 +735,26 @@ const OrderPage = () => {
               className='order-box3-btn'
               style={{ border: "1px solid #FE4A1B" }}
               onClick={() => {
-                navigate(-1);
+                if (saveState) {
+                  navigate(-1);
+                } else {
+                  confirm({
+                    title: "The order has not been saved, whether to continue to exit?",
+                    icon: <ExclamationCircleOutlined />,
+                    onOk() {
+                      navigate(-1);
+                    },
+                    onCancel() {
+                      console.log("Cancel");
+                    },
+                  });
+                }
               }}
             >
               <Quit />
               <div style={{ color: "#FE4A1B" }}>Quit</div>
             </Button>
-            <Popover placement='leftTop' content={<OrderType />} trigger='click' open={orderTypeShow} onOpenChange={() => setOrderTypeShow((prev) => !prev)}>
+            <Popover placement='leftTop' content={<OrderType orderListData={orderListData} />} trigger='click' open={orderTypeShow} onOpenChange={() => setOrderTypeShow((prev) => !prev)}>
               <Button
                 className='order-box3-btn'
                 onClick={() => {
@@ -711,12 +794,17 @@ const OrderPage = () => {
                 Set time
               </div>
             </Button>
-            <SetTime setTimeShow={setTimeShow} setSetTimeShow={setSetTimeShow} />
+            <SetTime setTimeShow={setTimeShow} setSetTimeShow={setSetTimeShow} changeOrderTime={changeOrderTime} />
 
             <Button
               className='order-box3-btn'
               onClick={() => {
-                setCheckText("Set price");
+                if (JSON.stringify(orderListData.orderItem) === "[]") {
+                  message.error("请先添加菜品或选择目标");
+                } else {
+                  setCheckText("Set price");
+                  setSetPriceShow(true);
+                }
               }}
               style={{
                 background: checkText === "Set price" ? "#0076fe" : "#FFF",
@@ -731,31 +819,55 @@ const OrderPage = () => {
                 Set price
               </div>
             </Button>
-            <Popover placement='left' content={<SelfInput setSelfInputShow={setSelfInputShow} />} trigger='click' open={selfInputShow} onOpenChange={() => setSelfInputShow((prev) => !prev)}>
-              <Button
-                className='order-box3-btn'
-                onClick={() => {
-                  setCheckText("Self Input");
-                }}
+
+            <SetPrice
+              setPriceShow={setPriceShow}
+              setSetPriceShow={setSetPriceShow}
+              notepadList={notepadList}
+              orderListData={orderListData}
+              setOrderListData={setOrderListData}
+              setSaveState={setSaveState}
+            />
+
+            <Button
+              className='order-box3-btn'
+              onClick={() => {
+                setCheckText("Self Input");
+                setSelfInputShow(true);
+              }}
+              style={{
+                background: checkText === "Self Input" ? "#0076fe" : "#FFF",
+              }}
+            >
+              {checkText === "Self Input" ? <File color={"#fff"} /> : <File color={"#0076fe"} />}
+              <div
                 style={{
-                  background: checkText === "Self Input" ? "#0076fe" : "#FFF",
+                  color: checkText === "Self Input" ? "#FFF" : "#0076fe",
                 }}
               >
-                {checkText === "Self Input" ? <File color={"#fff"} /> : <File color={"#0076fe"} />}
-                <div
-                  style={{
-                    color: checkText === "Self Input" ? "#FFF" : "#0076fe",
-                  }}
-                >
-                  Self Input
-                </div>
-              </Button>
-            </Popover>
+                Self Input
+              </div>
+            </Button>
+
+            <SelfInput selfInputShow={selfInputShow} setSelfInputShow={setSelfInputShow} setOrderListData={setOrderListData} setSaveState={setSaveState} />
+
             <Button
               className='order-box3-btn'
               onClick={() => {
                 setCheckText("Split Check");
-                SplitCheck();
+                if (JSON.stringify(orderListData.orderItem) !== "[]") {
+                  confirm({
+                    title: "Save your order and split it?",
+                    icon: <ExclamationCircleOutlined />,
+                    onOk() {
+                      dispatch(changeOrderList({ ...orderListData }));
+                      navigate(`/split-check/${orderListData.id}`);
+                    },
+                    onCancel() {
+                      console.log("Cancel");
+                    },
+                  });
+                }
               }}
               style={{
                 background: checkText === "Split Check" ? "#0076fe" : "#FFF",
@@ -770,9 +882,10 @@ const OrderPage = () => {
                 Split Check
               </div>
             </Button>
+
             <Popover
               placement='leftBottom'
-              content={<ChangePrice type={"discount"} quit={setDiscountShow} />}
+              content={<ChangePrice type={"discount"} quit={setDiscountShow} save={changeDiscount} />}
               trigger='click'
               open={discountShow}
               onOpenChange={() => setDiscountShow((prev) => !prev)}
@@ -796,7 +909,13 @@ const OrderPage = () => {
                 </div>
               </Button>
             </Popover>
-            <Popover placement='leftBottom' content={<ChangePrice type={"tips"} quit={setTipsShow} />} trigger='click' open={tipsShow} onOpenChange={() => setTipsShow((prev) => !prev)}>
+            <Popover
+              placement='leftBottom'
+              content={<ChangePrice type={"tips"} quit={setTipsShow} save={changeTip} />}
+              trigger='click'
+              open={tipsShow}
+              onOpenChange={() => setTipsShow((prev) => !prev)}
+            >
               <Button
                 className='order-box3-btn'
                 onClick={() => {
@@ -821,14 +940,7 @@ const OrderPage = () => {
  * @description: 订单类型切换
  * @return {*}
  */
-const OrderType = () => {
-  const dispatch = useDispatch();
-  const orderType = useSelector((state) => state.orderList.orderType);
-
-  useEffect(() => {
-    console.log(orderType);
-  }, [orderType]);
-
+const OrderType = ({ orderListData }) => {
   return (
     <div style={{ padding: 20 }}>
       <div>
@@ -836,11 +948,11 @@ const OrderType = () => {
           className='orderType-btn'
           onClick={() => {}}
           style={{
-            background: orderType === "Walk In" ? "#0076fe" : "#FFF",
-            color: orderType === "Walk In" ? "#fff" : "#0076fe",
+            background: orderListData.orderType === "walk-in" ? "#0076fe" : "#FFF",
+            color: orderListData.orderType === "walk-in" ? "#fff" : "#0076fe",
           }}
         >
-          <Pedestrian color={orderType === "Walk In" ? "#fff" : "#0076fe"} />
+          <Pedestrian color={orderListData.orderType === "walk-in" ? "#fff" : "#0076fe"} />
           <div>Walk In</div>
         </Button>
         <Button className='orderType-btn' style={{ margin: "0 10px" }} onClick={() => {}}>
@@ -851,11 +963,11 @@ const OrderType = () => {
           className='orderType-btn'
           onClick={() => {}}
           style={{
-            background: orderType === "Pick Up" ? "#0076fe" : "#FFF",
-            color: orderType === "Pick Up" ? "#fff" : "#0076fe",
+            background: orderListData.orderType === "Pick Up" ? "#0076fe" : "#FFF",
+            color: orderListData.orderType === "Pick Up" ? "#fff" : "#0076fe",
           }}
         >
-          <BagFull color={orderType === "Pick Up" ? "#fff" : "#0076fe"} />
+          <BagFull color={orderListData.orderType === "Pick Up" ? "#fff" : "#0076fe"} />
           <div>Pick Up</div>
         </Button>
       </div>
@@ -864,12 +976,12 @@ const OrderType = () => {
           className='orderType-btn'
           style={{
             marginRight: 10,
-            background: orderType === "Delivery" ? "#0076fe" : "#FFF",
-            color: orderType === "Delivery" ? "#fff" : "#0076fe",
+            background: orderListData.orderType === "Delivery" ? "#0076fe" : "#FFF",
+            color: orderListData.orderType === "Delivery" ? "#fff" : "#0076fe",
           }}
           onClick={() => {}}
         >
-          <ElectricCar color={orderType === "Delivery" ? "#fff" : "#0076fe"} />
+          <ElectricCar color={orderListData.orderType === "Delivery" ? "#fff" : "#0076fe"} />
           <div>Delivery</div>
         </Button>
         <Button className='orderType-btn' onClick={() => {}}>
@@ -883,18 +995,25 @@ const OrderType = () => {
 
 /**
  * @description: 日历切换
+ * @param {*} setTimeShow 显示隐藏
+ * @param {*} setSetTimeShow 切换显示隐藏状态
+ * @param {*} changeOrderTime 保存函数
  * @return {*}
  */
-const SetTime = ({ setSetTimeShow, setTimeShow }) => {
+const SetTime = ({ setSetTimeShow, setTimeShow, changeOrderTime }) => {
+  let newDate = new Date();
+
+  const [date, setDate] = useState(
+    `${newDate.getFullYear()}-${newDate.getMonth() + 1 < 10 ? `0${newDate.getMonth() + 1}` : newDate.getMonth() + 1}-${newDate.getDate() < 10 ? `0${newDate.getDate()}` : newDate.getDate()}`
+  );
+
   const onPanelChange = (value) => {
-    console.log(value.format("YYYY-MM-DD"));
+    setDate(value.format("YYYY-MM-DD"));
   };
 
   const [hour, setHour] = useState("00");
 
   const [min, setMin] = useState("00");
-
-  const changeNow = () => {};
 
   return (
     <Modal
@@ -909,16 +1028,41 @@ const SetTime = ({ setSetTimeShow, setTimeShow }) => {
             <Button
               type='primary'
               onClick={() => {
-                changeNow();
+                let date = new Date();
+                setHour(date.getHours());
+                setMin(date.getMinutes());
               }}
             >
-              Now
+              Now Hour Minute
             </Button>
-            <Button type='primary'>Clear</Button>
+            <Button
+              type='primary'
+              onClick={() => {
+                setHour("00");
+                setMin("00");
+              }}
+            >
+              Clear
+            </Button>
           </div>
           <div>
-            <Button type='primary'>Save</Button>
-            <Button type='primary'>Quit</Button>
+            <Button
+              type='primary'
+              onClick={() => {
+                changeOrderTime(`${date} ${hour}:${min}`);
+                setSetTimeShow(false);
+              }}
+            >
+              Save
+            </Button>
+            <Button
+              type='primary'
+              onClick={() => {
+                setSetTimeShow(false);
+              }}
+            >
+              Quit
+            </Button>
           </div>
         </div>,
       ]}
@@ -1022,7 +1166,7 @@ const SetTime = ({ setSetTimeShow, setTimeShow }) => {
                     {monthOptions}
                   </Select>
                 </Col>
-                <Col>设置时间：</Col>
+                <Col>设置日期</Col>
                 <Col>
                   <Select
                     size='small'
@@ -1061,162 +1205,234 @@ const SetTime = ({ setSetTimeShow, setTimeShow }) => {
 };
 
 /**
+ * @description: 价格切换
+ * @param {*} setPriceShow 显示隐藏
+ * @param {*} setSetPriceShow 切换显示隐藏状态
+ * @return {*}
+ */
+const SetPrice = ({ setPriceShow, setSetPriceShow, notepadList, orderListData, setOrderListData, setSaveState }) => {
+  const [price, setPrice] = useState("");
+
+  useEffect(() => {
+    if (JSON.stringify(orderListData.orderItem) !== "[]") {
+      if (notepadList[1] === undefined) {
+        setPrice(orderListData.orderItem[notepadList[0]].price);
+      } else {
+        setPrice(orderListData.orderItem[notepadList[0]].orderItemsOptions[notepadList[1]].price);
+      }
+    }
+  }, [notepadList, orderListData]);
+
+  /**
+   * @description: 修改价格
+   * @param {*} value 价格
+   * @return {*}
+   */
+  const changePrice = (value) => {
+    setOrderListData(
+      produce((draft) => {
+        if (notepadList[1] === undefined) {
+          draft.orderItem[notepadList[0]].price = value;
+        } else {
+          draft.orderItem[notepadList[0]].orderItemsOptions[notepadList[1]].price = value;
+        }
+      })
+    );
+    setSaveState(false);
+  };
+
+  return (
+    <Modal title='Set Price' open={setPriceShow} onOk={() => setSetPriceShow(false)} onCancel={() => setSetPriceShow(false)} centered>
+      <ChangePrice type={"setPrice"} quit={setSetPriceShow} orderNumber={price} save={changePrice} />
+    </Modal>
+  );
+};
+
+/**
  * @description: SelfInput
  * @return {*}
  */
-const SelfInput = ({ setSelfInputShow }) => {
+const SelfInput = ({ setSelfInputShow, selfInputShow, setOrderListData, setSaveState }) => {
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [quantitly, setQuantitly] = useState("");
 
   const [distinguish, setDistinguish] = useState("name");
 
+  let newDish = {
+    restaurantInfoId: 2,
+    quantity: Number(quantitly),
+    name: name,
+    cnName: name,
+    price: Number(price),
+    itemId: null,
+    orderItemsOptions: [],
+    categoryId: null,
+    categoryName: null,
+    categoryCnName: null,
+    specialInstructions: null,
+    printerName: "[]",
+    printable: true,
+    mOrderItem: {},
+    taxExempt: false,
+  };
+
+  const save = () => {
+    setOrderListData(
+      produce((draft) => {
+        draft.orderItem.push(newDish);
+      })
+    );
+    setSaveState(false);
+  };
+
   return (
-    <div className='selfInput'>
-      <div className='selfInput-content'>
-        <div className='selfInput-content-left'>
-          <div className='selfInput-content-left-item'>
-            <div style={{ minWidth: 70 }}>Name:</div>
-            <Input
-              className='selfInput-content-left-item-input'
-              value={name}
-              onClick={() => {
-                setDistinguish("name");
-              }}
-              style={{
-                borderColor: distinguish === "name" ? "#0076fe" : "#333",
-              }}
-            />
-          </div>
-          <div className='selfInput-content-left-item'>
-            <div style={{ minWidth: 70 }}>Price:</div>
-            <Input
-              className='selfInput-content-left-item-input'
-              value={price}
-              onClick={() => {
-                setDistinguish("price");
-              }}
-              style={{
-                borderColor: distinguish === "price" ? "#0076fe" : "#333",
-              }}
-            />
-            <Button
-              type='primary'
-              className='selfInput-content-left-item-btn'
-              onClick={() => {
-                setPrice((prev) => (prev += 3));
-                setDistinguish("price");
-              }}
-            >
-              3.00
-            </Button>
-            <Button
-              type='primary'
-              className='selfInput-content-left-item-btn'
-              onClick={() => {
-                setPrice((prev) => (prev += 4));
-                setDistinguish("price");
-              }}
-            >
-              4.00
-            </Button>
-          </div>
-          <div className='selfInput-content-left-item'>
-            <div style={{ minWidth: 70 }}>Quantitly:</div>
-            <Input
-              className='selfInput-content-left-item-input'
-              value={quantitly}
-              onClick={() => {
-                setDistinguish("quantitly");
-              }}
-              style={{
-                borderColor: distinguish === "quantitly" ? "#0076fe" : "#333",
-              }}
-            />
-            <Button
-              type='primary'
-              className='selfInput-content-left-item-btn'
-              onClick={() => {
-                setQuantitly((prev) => (prev += 3));
-                setDistinguish("quantitly");
-              }}
-            >
-              3.00
-            </Button>
-            <Button
-              type='primary'
-              className='selfInput-content-left-item-btn'
-              onClick={() => {
-                setQuantitly((prev) => (prev += 4));
-                setDistinguish("quantitly");
-              }}
-            >
-              4.00
-            </Button>
-          </div>
-        </div>
-        <div className='selfInput-content-right'>
-          <div style={{ minWidth: 70 }}>Print to:</div>
-          <div className='selfInput-content-right-box'>
-            <div className='selfInput-content-right-printer'>
-              <div className='selfInput-content-right-printer-item'>
-                <Printer color={"#333"} />
-                <div style={{ marginLeft: 8 }}>Printer No.1</div>
-              </div>
-              <div className='selfInput-content-right-printer-item'>
-                <Printer color={"#333"} />
-                <div style={{ marginLeft: 8 }}>Printer No.1</div>
-              </div>
+    <Modal title='Self Input' open={selfInputShow} onOk={() => setSelfInputShow(false)} onCancel={() => setSelfInputShow(false)} width={800} footer={null} centered>
+      <div className='selfInput'>
+        <div className='selfInput-content'>
+          <div className='selfInput-content-left'>
+            <div className='selfInput-content-left-item'>
+              <div style={{ minWidth: 70 }}>Name:</div>
+              <Input
+                className='selfInput-content-left-item-input'
+                value={name}
+                onClick={() => {
+                  setDistinguish("name");
+                }}
+                style={{
+                  borderColor: distinguish === "name" ? "#0076fe" : "#333",
+                }}
+              />
             </div>
-            <div style={{ marginTop: 10 }}>
-              <Button className='selfInput-content-right-btn'>Up</Button>
-              <Button className='selfInput-content-right-btn' style={{ marginLeft: 8 }}>
-                Down
+            <div className='selfInput-content-left-item'>
+              <div style={{ minWidth: 70 }}>Price:</div>
+              <Input
+                className='selfInput-content-left-item-input'
+                value={price}
+                onClick={() => {
+                  setDistinguish("price");
+                }}
+                style={{
+                  borderColor: distinguish === "price" ? "#0076fe" : "#333",
+                }}
+              />
+              <Button
+                type='primary'
+                className='selfInput-content-left-item-btn'
+                onClick={() => {
+                  setPrice((prev) => (prev = 1));
+                  setDistinguish("price");
+                }}
+              >
+                1.00
+              </Button>
+              <Button
+                type='primary'
+                className='selfInput-content-left-item-btn'
+                onClick={() => {
+                  setPrice((prev) => (prev = 2));
+                  setDistinguish("price");
+                }}
+              >
+                2.00
+              </Button>
+            </div>
+            <div className='selfInput-content-left-item'>
+              <div style={{ minWidth: 70 }}>Quantitly:</div>
+              <Input
+                className='selfInput-content-left-item-input'
+                value={quantitly}
+                onClick={() => {
+                  setDistinguish("quantitly");
+                }}
+                style={{
+                  borderColor: distinguish === "quantitly" ? "#0076fe" : "#333",
+                }}
+              />
+              <Button
+                type='primary'
+                className='selfInput-content-left-item-btn'
+                onClick={() => {
+                  setPrice((prev) => (prev = 3));
+                  setDistinguish("price");
+                }}
+              >
+                3.00
+              </Button>
+              <Button
+                type='primary'
+                className='selfInput-content-left-item-btn'
+                onClick={() => {
+                  setPrice((prev) => (prev = 4));
+                  setDistinguish("price");
+                }}
+              >
+                4.00
               </Button>
             </div>
           </div>
+          <div className='selfInput-content-right'>
+            <div style={{ minWidth: 70 }}>Print to:</div>
+            <div className='selfInput-content-right-box'>
+              <div className='selfInput-content-right-printer'>
+                <div className='selfInput-content-right-printer-item'>
+                  <Printer color={"#333"} />
+                  <div style={{ marginLeft: 8 }}>Printer No.1</div>
+                </div>
+                <div className='selfInput-content-right-printer-item'>
+                  <Printer color={"#333"} />
+                  <div style={{ marginLeft: 8 }}>Printer No.1</div>
+                </div>
+              </div>
+              <div style={{ marginTop: 10 }}>
+                <Button className='selfInput-content-right-btn'>Up</Button>
+                <Button className='selfInput-content-right-btn' style={{ marginLeft: 8 }}>
+                  Down
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <Keyboard changeText={distinguish === "name" ? setName : distinguish === "price" ? setPrice : setQuantitly} />
+        <div className='selfInput-btn'>
+          <Button
+            className='selfInput-btn-item'
+            onClick={() => {
+              if (name !== "" && price !== "" && quantitly !== "") {
+                save();
+                setSelfInputShow(false);
+                setName("");
+                setPrice("");
+                setQuantitly("");
+              } else {
+                message.error("请先输入信息再进行保存");
+              }
+            }}
+          >
+            <Save />
+            Save
+          </Button>
+          <Button
+            className='selfInput-btn-item'
+            style={{
+              border: "1px solid #FE4A1B",
+              color: "#FE4A1B",
+              marginLeft: 10,
+            }}
+            onClick={() => {
+              setSelfInputShow((prev) => !prev);
+              setName("");
+              setPrice("");
+              setQuantitly("");
+            }}
+          >
+            <Quit />
+            Quit
+          </Button>
         </div>
       </div>
-      <Keyboard changeText={distinguish === "name" ? setName : distinguish === "price" ? setPrice : setQuantitly} />
-      <div className='selfInput-btn'>
-        <Button className='selfInput-btn-item'>
-          <Save />
-          Save
-        </Button>
-        <Button
-          className='selfInput-btn-item'
-          style={{
-            border: "1px solid #FE4A1B",
-            color: "#FE4A1B",
-            marginLeft: 10,
-          }}
-          onClick={() => {
-            setSelfInputShow((prev) => !prev);
-          }}
-        >
-          <Quit />
-          Quit
-        </Button>
-      </div>
-    </div>
+    </Modal>
   );
-};
-
-/**
- * @description: 弹窗
- * @return {*}
- */
-const SplitCheck = () => {
-  confirm({
-    title: "Save your order and split it?",
-    icon: <ExclamationCircleOutlined />,
-    onOk() {
-      console.log("OK");
-    },
-    onCancel() {
-      console.log("Cancel");
-    },
-  });
 };
 
 const DishList = ({ dishShow, touchOK, touchCancel, mock, orderListTemp, setOrderListTemp, changeOrderInfo, orderInfo }) => {
@@ -1366,18 +1582,20 @@ const DishList = ({ dishShow, touchOK, touchCancel, mock, orderListTemp, setOrde
         </Button>,
       ]}
     >
-      {mock.optionsList.map((item, index) => (
-        <OptionsList
-          key={index.toString()}
-          item={item}
-          index={index}
-          AddOrder={AddOrder}
-          orderListTemp={orderListTemp}
-          setUncheckedList={setUncheckedList}
-          uncheckedList={uncheckedList}
-          unchecked={unchecked}
-        />
-      ))}
+      <div style={{ maxHeight: 400, overflow: "auto" }}>
+        {mock.optionsList.map((item, index) => (
+          <OptionsList
+            key={index.toString()}
+            item={item}
+            index={index}
+            AddOrder={AddOrder}
+            orderListTemp={orderListTemp}
+            setUncheckedList={setUncheckedList}
+            uncheckedList={uncheckedList}
+            unchecked={unchecked}
+          />
+        ))}
+      </div>
     </Modal>
   );
 };

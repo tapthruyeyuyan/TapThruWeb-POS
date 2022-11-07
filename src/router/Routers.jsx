@@ -21,6 +21,7 @@ import Tip from "../../view/Tip/Tip";
 import ClockIn from "../../view/ClockIn/ClockIn";
 import Buffet from "../../view/Buffet/Buffet";
 import Table from "../../view/Table/Table";
+import SplitCheck from "../../view/SplitCheck/SplitCheck";
 
 const Routers = () => {
   const store = useSelector((state) => state.storeInfo);
@@ -48,7 +49,7 @@ const Routers = () => {
       component: <POSMode />,
     },
     {
-      path: "/order-page",
+      path: "/order-page/:type",
       auth: true,
       component: <OrderPage />,
     },
@@ -123,6 +124,11 @@ const Routers = () => {
       component: <Table />,
     },
     {
+      path: "/split-check/:id",
+      auth: true,
+      component: <SplitCheck />,
+    },
+    {
       path: "*",
       auth: true,
       component: <div>404</div>,
@@ -133,19 +139,7 @@ const Routers = () => {
   const RouteNav = (param) => {
     return param.map((item) => {
       return (
-        <Route
-          path={item.path}
-          element={
-            item.path === pathname &&
-            item.auth &&
-            JSON.stringify(store) === "{}" ? (
-              <Navigate to="/login" replace={true}></Navigate>
-            ) : (
-              item.component
-            )
-          }
-          key={item.path}
-        >
+        <Route path={item.path} element={item.path === pathname && item.auth && JSON.stringify(store) === "{}" ? <Navigate to='/login' replace={true}></Navigate> : item.component} key={item.path}>
           {item?.child && RouteNav(item.child)}
         </Route>
       );

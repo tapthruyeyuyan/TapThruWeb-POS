@@ -2,7 +2,11 @@ import { createSlice, current } from "@reduxjs/toolkit";
 
 const initialState = {
   storeInfo: {},
-  orderList: [],
+  orderList: [
+    {
+      id: 2,
+    },
+  ],
   infomation: [],
   table: [
     {
@@ -103,17 +107,36 @@ export const storeInfo = createSlice({
         state.setupPW[index] = data;
       }
     },
+
+    /**
+     * @description: 保存信息
+     * @return {*}
+     */
+    changeOrderList: (state, { payload }) => {
+      const { id } = payload;
+      let bol = false;
+      if (JSON.stringify(state.orderList) === "[]") {
+        bol = true;
+      } else {
+        for (let i = 0; i < state.orderList.length; i++) {
+          if (state.orderList[i].id === id) {
+            state.orderList[i] = { ...payload };
+            bol = false;
+            break;
+          } else {
+            bol = true;
+          }
+        }
+      }
+
+      if (bol) {
+        state.orderList.push({ ...payload });
+      }
+    },
   },
 });
 
 // Action creators are generated for each case reducer function
-export const {
-  getStoreInfo,
-  changeTips,
-  changeDiscount,
-  changeInfomation,
-  changeTable,
-  changeUserInfo,
-} = storeInfo.actions;
+export const { getStoreInfo, changeTips, changeDiscount, changeInfomation, changeTable, changeUserInfo, changeOrderList } = storeInfo.actions;
 
 export default storeInfo.reducer;
