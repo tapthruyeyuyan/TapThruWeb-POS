@@ -1,11 +1,12 @@
+import produce from "immer";
 import React, { useEffect, useState } from "react";
 import "./SplitCheck.less";
 import { useParams, useNavigate } from "react-router";
-import { useSelector } from "react-redux";
-import { Button, Input, Modal } from "antd";
+import { useSelector, useDispatch } from "react-redux";
+import { Button, Input, message, Modal } from "antd";
 import { Split, Wallet, ReprintCredit, Modify, Check, Save, Quit } from "../../component/Svg/Svg";
-import produce from "immer";
 import ChangePrice from "../../component/Tax/ChangePrice";
+import { saveSpiltEvent } from "../../src/store/storeInfoSlice";
 
 const SplitCheck = () => {
   // 获取路由id
@@ -13,19 +14,25 @@ const SplitCheck = () => {
 
   //   获取对应商店的信息
   const orderInfo = useSelector((state) => state.orderList);
+
   // 路由跳转
   const navigate = useNavigate();
+
+  const dispatch = useDispatch();
 
   // 对应商店信息数据
   const [orderData, setOrderData] = useState({});
 
   //   进入页面传入useState
   useEffect(() => {
-    setOrderData(
-      produce((draft) => {
-        return orderInfo.filter((item) => item.id === Number(params.id))[0];
-      })
-    );
+    reset();
+    if (orderInfo[Number(params.id)].splitEvent !== undefined) {
+      setSelectedList(orderInfo[Number(params.id)].splitEvent);
+    }
+    if (orderInfo[Number(params.id)].averageState !== undefined) {
+      setAverageState(orderInfo[Number(params.id)].averageState);
+      setOrderData([]);
+    }
   }, []);
 
   // 弹窗显示隐藏
@@ -34,12 +41,40 @@ const SplitCheck = () => {
   //   选中列表
   const [checkList, setCheckList] = useState([]);
 
+  // 是否选中分类下标
+  const [checkListState, setCheckListState] = useState(false);
+
+  // 分类下标
+  const [checkListIndex, setCheckListIndex] = useState();
+
+  // 平均分单
+  const [averageState, setAverageState] = useState(false);
+
   /**
    * @description: 选中判断
    * @param {*} index   选中的下标
    * @return {*}
    */
   const onClickCheckList = (index) => {
+    if (checkListState) {
+      setSelectedList(
+        produce((draft) => {
+          let bol = true;
+          for (let i = 0; i < draft[checkListIndex].length; i++) {
+            if (draft[checkListIndex][i].index === index) {
+              draft[checkListIndex].splice(i, 1);
+              bol = false;
+              break;
+            } else {
+              bol = true;
+            }
+          }
+          if (bol) {
+            draft[checkListIndex].push({ price: orderData.orderItem[index].price, quantity: orderData.orderItem[index].quantity, index: index });
+          }
+        })
+      );
+    }
     setCheckList(
       produce((draft) => {
         let bol = false;
@@ -65,6 +100,10 @@ const SplitCheck = () => {
    */
   const [selectedList, setSelectedList] = useState([]);
 
+  /**
+   * @description: 提交选择列表
+   * @return {*}
+   */
   const selected = () => {
     setSelectedList(
       produce((darft) => {
@@ -78,13 +117,85 @@ const SplitCheck = () => {
     setCheckList([]);
   };
 
-  useEffect(() => {
-    console.log(orderData);
-  }, [orderData]);
+  /**
+   * @description: 修改选中列表
+   * @param {*} index
+   * @return {*}
+   */
+  const changeCheckList = (index) => {
+    setCheckListState(true);
+    setCheckListIndex(index);
+    for (let i = 0; i < selectedList[index].length; i++) {
+      setCheckList((prev) => {
+        const next = [...prev];
+        next.push(selectedList[index][i].index);
+        return next;
+      });
+    }
+  };
+
+  /**
+   * @description: 平均分单
+   * @param {*} value
+   * @return {*}
+   */
+  const average = (value) => {
+    // console.log(value);
+    setSelectedList([]);
+    let temp = 0;
+    for (let i = 0; i < orderData.orderItem.length; i++) {
+      for (let j = 0; j < orderData.orderItem[i].orderItemsOptions.length; j++) {
+        temp += orderData.orderItem[i].orderItemsOptions[j].price * orderData.orderItem[i].orderItemsOptions[j].quantity;
+      }
+      temp += orderData.orderItem[i].price * orderData.orderItem[i].quantity;
+    }
+
+    for (let o = 0; o < value; o++) {
+      setSelectedList((prev) => {
+        const next = [...prev];
+        next.push({ quantity: 1, price: Number((temp / value).toFixed(2)) });
+        return next;
+      });
+    }
+
+    setOrderData(
+      produce((darft) => {
+        darft.orderItem = [];
+      })
+    );
+
+    setAverageState(true);
+  };
 
   useEffect(() => {
     console.log(selectedList);
   }, [selectedList]);
+
+  /**
+   * @description: 重置
+   * @return {*}
+   */
+  const reset = () => {
+    setOrderData(
+      produce((draft) => {
+        return orderInfo.filter((item) => item.id === Number(params.id))[0];
+      })
+    );
+    setCheckList([]);
+    setCheckListState(false);
+    setCheckListIndex();
+    setSelectedList([]);
+    setAverageState(false);
+  };
+
+  /**
+   * @description: 保存到redux中
+   * @return {*}
+   */
+  const save = () => {
+    dispatch(saveSpiltEvent({ id: orderData.id, data: selectedList, averageState: averageState }));
+    message.success("save success");
+  };
 
   return (
     <div className='splitchek'>
@@ -92,20 +203,25 @@ const SplitCheck = () => {
         <div className='splitchek-left-box'>
           {selectedList.map((item, index) => {
             let temp = 0;
-            for (let i = 0; i < item.length; i++) {
-              temp += item[i].price * item[i].quantity;
+            if (item.length !== undefined) {
+              for (let i = 0; i < item.length; i++) {
+                temp += item[i].price * item[i].quantity;
+              }
+            } else {
+              temp += item.price * item.quantity;
             }
             return (
               <Button
                 key={index.toString()}
                 type='primary'
                 className='splitchek-btn'
-                onClick={() => {}}
-                // style={{ background: bol && "#FE4A1B", borderColor: bol && "#FE4A1B" }}
-                // disabled={bols}
+                onClick={() => {
+                  changeCheckList(index);
+                }}
+                style={{ background: checkListIndex === index && "#FE4A1B", borderColor: checkListIndex === index && "#FE4A1B" }}
               >
                 <div>{`Check${index + 1}`}</div>
-                <div>{temp.toFixed(2)}</div>
+                <div>{Number(temp).toFixed(2)}</div>
               </Button>
             );
           })}
@@ -126,6 +242,9 @@ const SplitCheck = () => {
 
             for (let i = 0; i < selectedList.length; i++) {
               for (let j = 0; j < selectedList[i].length; j++) {
+                if (i === checkListIndex && checkListState && checkListIndex !== undefined) {
+                  continue;
+                }
                 if (selectedList[i][j].index === index) {
                   bols = true;
                   break;
@@ -137,6 +256,7 @@ const SplitCheck = () => {
                 break;
               }
             }
+
             return (
               <Button
                 type='primary'
@@ -167,14 +287,25 @@ const SplitCheck = () => {
           <div className='splitchek-right-btn-text'>平均分单</div>
         </Button>
 
-        <SplitCheckNumber splitChekNumberShow={splitChekNumberShow} setSplitChekNumberShow={setSplitChekNumberShow} />
+        <SplitCheckNumber splitChekNumberShow={splitChekNumberShow} setSplitChekNumberShow={setSplitChekNumberShow} average={average} />
 
         <Button
           type='primary'
           className='splitchek-right-btn'
           onClick={() => {
-            selected();
+            if (checkListState) {
+              if (JSON.stringify(checkList) === "[]") {
+                message.error("You must select at least 1 item to perform split!");
+              } else {
+                setCheckListState(false);
+                setCheckList([]);
+                setCheckListIndex();
+              }
+            } else {
+              selected();
+            }
           }}
+          disabled={averageState}
         >
           <Check />
           <div className='splitchek-right-btn-text'>选择</div>
@@ -183,7 +314,14 @@ const SplitCheck = () => {
           <Wallet size={"24"} color={"#fff"} />
           <div className='splitchek-right-btn-text'>付款</div>
         </Button>
-        <Button type='primary' className='splitchek-right-btn'>
+        <Button
+          type='primary'
+          className='splitchek-right-btn'
+          onClick={() => {
+            save();
+          }}
+          disabled={checkListState}
+        >
           <Save color={"#fff"} />
           <div className='splitchek-right-btn-text'>只保存</div>
         </Button>
@@ -195,7 +333,13 @@ const SplitCheck = () => {
           <ReprintCredit color={"#fff"} />
           <div className='splitchek-right-btn-text'>打印所有</div>
         </Button>
-        <Button type='primary' className='splitchek-right-btn'>
+        <Button
+          type='primary'
+          className='splitchek-right-btn'
+          onClick={() => {
+            reset();
+          }}
+        >
           <Modify color={"#fff"} />
           <div className='splitchek-right-btn-text'>Reset</div>
         </Button>
@@ -222,7 +366,7 @@ const SplitCheck = () => {
  * @param {*} setSplitChekNumberShow    修改显示隐藏
  * @return {*}
  */
-const SplitCheckNumber = ({ splitChekNumberShow, setSplitChekNumberShow }) => {
+const SplitCheckNumber = ({ splitChekNumberShow, setSplitChekNumberShow, average }) => {
   const [splitCheck, setSplitCheck] = useState("");
 
   return (
@@ -233,6 +377,7 @@ const SplitCheckNumber = ({ splitChekNumberShow, setSplitChekNumberShow }) => {
         setSplitChekNumberShow(false);
       }}
       onOk={() => {
+        average(Number(splitCheck));
         setSplitChekNumberShow(false);
       }}
       centered

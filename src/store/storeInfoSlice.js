@@ -133,10 +133,24 @@ export const storeInfo = createSlice({
         state.orderList.push({ ...payload });
       }
     },
+
+    /**
+     * @description: 保存分单
+     * @return {*}
+     */
+    saveSpiltEvent: (state, { payload }) => {
+      const { id, data, averageState } = payload;
+      for (let i = 0; i < state.orderList.length; i++) {
+        if (state.orderList[i].id === id) {
+          state.orderList[i].splitEvent = data;
+          state.orderList[i].averageState = averageState;
+        }
+      }
+    },
   },
 });
 
 // Action creators are generated for each case reducer function
-export const { getStoreInfo, changeTips, changeDiscount, changeInfomation, changeTable, changeUserInfo, changeOrderList } = storeInfo.actions;
+export const { getStoreInfo, changeTips, changeDiscount, changeInfomation, changeTable, changeUserInfo, changeOrderList, saveSpiltEvent } = storeInfo.actions;
 
 export default storeInfo.reducer;
