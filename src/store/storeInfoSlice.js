@@ -2,11 +2,7 @@ import { createSlice, current } from "@reduxjs/toolkit";
 
 const initialState = {
   storeInfo: {},
-  orderList: [
-    {
-      id: 2,
-    },
-  ],
+  orderList: [],
   infomation: [],
   table: [
     {
@@ -151,6 +147,7 @@ export const storeInfo = createSlice({
 });
 
 // Action creators are generated for each case reducer function
-export const { getStoreInfo, changeTips, changeDiscount, changeInfomation, changeTable, changeUserInfo, changeOrderList, saveSpiltEvent } = storeInfo.actions;
+export const { getStoreInfo, changeTips, changeDiscount, changeInfomation, changeTable, changeUserInfo, changeOrderList, saveSpiltEvent } =
+  storeInfo.actions;
 
 export default storeInfo.reducer;

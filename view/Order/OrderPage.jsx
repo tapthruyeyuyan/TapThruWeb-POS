@@ -323,6 +323,8 @@ const OrderPage = () => {
     setTime: null,
     id: 1,
     orderItem: [],
+    splitEvent: null,
+    averageState: null,
   });
 
   /**
@@ -582,8 +584,7 @@ const OrderPage = () => {
                     className='order-content-category-btn'
                     onClick={() => {
                       setPageNumber((prve) => (prve -= 1));
-                    }}
-                  >
+                    }}>
                     Last Page
                   </Button>
                 )}
@@ -595,8 +596,7 @@ const OrderPage = () => {
                     key={index.toString()}
                     onClick={() => {
                       changeDishs(item);
-                    }}
-                  >
+                    }}>
                     {item.name}
                   </Button>
                 ))}
@@ -606,8 +606,7 @@ const OrderPage = () => {
                     className='order-content-category-btn'
                     onClick={() => {
                       setPageNumber((prve) => (prve += 1));
-                    }}
-                  >
+                    }}>
                     Next Page
                   </Button>
                 )}
@@ -622,8 +621,7 @@ const OrderPage = () => {
                     className='order-content-category-btn'
                     onClick={() => {
                       setDishNumber((prve) => (prve -= 1));
-                    }}
-                  >
+                    }}>
                     Next Page
                   </Button>
                 )}
@@ -636,8 +634,7 @@ const OrderPage = () => {
                       key={index.toString()}
                       onClick={() => {
                         setDishShow(true);
-                      }}
-                    >
+                      }}>
                       {item.name}
                     </Button>
                   ))}
@@ -648,8 +645,7 @@ const OrderPage = () => {
                     className='order-content-category-btn'
                     onClick={() => {
                       setDishNumber((prve) => (prve += 1));
-                    }}
-                  >
+                    }}>
                     Next Page
                   </Button>
                 )}
@@ -681,8 +677,7 @@ const OrderPage = () => {
                 content={<ChangePrice type={"qty"} orderNumber={qtyNumbers} save={changeOrderNumber} quit={setQty} />}
                 trigger='click'
                 open={qty}
-                onOpenChange={() => setQty((prev) => !prev)}
-              >
+                onOpenChange={() => setQty((prev) => !prev)}>
                 <Button className='order-box2-qty-item'>Qty</Button>
               </Popover>
               <Button
@@ -690,16 +685,14 @@ const OrderPage = () => {
                 style={{ margin: "0 10px" }}
                 onClick={() => {
                   deleteOrder();
-                }}
-              >
+                }}>
                 <Subtract />
               </Button>
               <Button
                 className='order-box2-qty-item'
                 onClick={() => {
                   addOrder();
-                }}
-              >
+                }}>
                 <Add />
               </Button>
             </div>
@@ -719,8 +712,7 @@ const OrderPage = () => {
                   } else {
                     message.error("Please select the dishes before saving");
                   }
-                }}
-              >
+                }}>
                 <Printer />
                 <div>Save</div>
               </Button>
@@ -742,19 +734,23 @@ const OrderPage = () => {
                     title: "The order has not been saved, whether to continue to exit?",
                     icon: <ExclamationCircleOutlined />,
                     onOk() {
-                      navigate(-1);
+                      navigate("/pos-mode");
                     },
                     onCancel() {
                       console.log("Cancel");
                     },
                   });
                 }
-              }}
-            >
+              }}>
               <Quit />
               <div style={{ color: "#FE4A1B" }}>Quit</div>
             </Button>
-            <Popover placement='leftTop' content={<OrderType orderListData={orderListData} />} trigger='click' open={orderTypeShow} onOpenChange={() => setOrderTypeShow((prev) => !prev)}>
+            <Popover
+              placement='leftTop'
+              content={<OrderType orderListData={orderListData} />}
+              trigger='click'
+              open={orderTypeShow}
+              onOpenChange={() => setOrderTypeShow((prev) => !prev)}>
               <Button
                 className='order-box3-btn'
                 onClick={() => {
@@ -762,14 +758,12 @@ const OrderPage = () => {
                 }}
                 style={{
                   background: checkText === "Order Type" ? "#0076fe" : "#FFF",
-                }}
-              >
+                }}>
                 {checkText === "Order Type" ? <Type color={"#fff"} /> : <Type color={"#0076fe"} />}
                 <div
                   style={{
                     color: checkText === "Order Type" ? "#FFF" : "#0076fe",
-                  }}
-                >
+                  }}>
                   Order Type
                 </div>
               </Button>
@@ -783,14 +777,12 @@ const OrderPage = () => {
               }}
               style={{
                 background: checkText === "Set time" ? "#0076fe" : "#FFF",
-              }}
-            >
+              }}>
               {checkText === "Set time" ? <Clock color={"#fff"} /> : <Clock color={"#0076fe"} />}
               <div
                 style={{
                   color: checkText === "Set time" ? "#FFF" : "#0076fe",
-                }}
-              >
+                }}>
                 Set time
               </div>
             </Button>
@@ -808,14 +800,12 @@ const OrderPage = () => {
               }}
               style={{
                 background: checkText === "Set price" ? "#0076fe" : "#FFF",
-              }}
-            >
+              }}>
               {checkText === "Set price" ? <Price color={"#fff"} /> : <Price color={"#0076fe"} />}
               <div
                 style={{
                   color: checkText === "Set price" ? "#FFF" : "#0076fe",
-                }}
-              >
+                }}>
                 Set price
               </div>
             </Button>
@@ -837,19 +827,22 @@ const OrderPage = () => {
               }}
               style={{
                 background: checkText === "Self Input" ? "#0076fe" : "#FFF",
-              }}
-            >
+              }}>
               {checkText === "Self Input" ? <File color={"#fff"} /> : <File color={"#0076fe"} />}
               <div
                 style={{
                   color: checkText === "Self Input" ? "#FFF" : "#0076fe",
-                }}
-              >
+                }}>
                 Self Input
               </div>
             </Button>
 
-            <SelfInput selfInputShow={selfInputShow} setSelfInputShow={setSelfInputShow} setOrderListData={setOrderListData} setSaveState={setSaveState} />
+            <SelfInput
+              selfInputShow={selfInputShow}
+              setSelfInputShow={setSelfInputShow}
+              setOrderListData={setOrderListData}
+              setSaveState={setSaveState}
+            />
 
             <Button
               className='order-box3-btn'
@@ -871,14 +864,12 @@ const OrderPage = () => {
               }}
               style={{
                 background: checkText === "Split Check" ? "#0076fe" : "#FFF",
-              }}
-            >
+              }}>
               {checkText === "Split Check" ? <Split color={"#fff"} /> : <Split color={"#0076fe"} />}
               <div
                 style={{
                   color: checkText === "Split Check" ? "#FFF" : "#0076fe",
-                }}
-              >
+                }}>
                 Split Check
               </div>
             </Button>
@@ -888,8 +879,7 @@ const OrderPage = () => {
               content={<ChangePrice type={"discount"} quit={setDiscountShow} save={changeDiscount} />}
               trigger='click'
               open={discountShow}
-              onOpenChange={() => setDiscountShow((prev) => !prev)}
-            >
+              onOpenChange={() => setDiscountShow((prev) => !prev)}>
               <Button
                 className='order-box3-btn'
                 onClick={() => {
@@ -897,14 +887,12 @@ const OrderPage = () => {
                 }}
                 style={{
                   background: checkText === "Discount" ? "#0076fe" : "#FFF",
-                }}
-              >
+                }}>
                 {checkText === "Discount" ? <Discount color={"#fff"} /> : <Discount color={"#0076fe"} />}
                 <div
                   style={{
                     color: checkText === "Discount" ? "#FFF" : "#0076fe",
-                  }}
-                >
+                  }}>
                   Discount
                 </div>
               </Button>
@@ -914,8 +902,7 @@ const OrderPage = () => {
               content={<ChangePrice type={"tips"} quit={setTipsShow} save={changeTip} />}
               trigger='click'
               open={tipsShow}
-              onOpenChange={() => setTipsShow((prev) => !prev)}
-            >
+              onOpenChange={() => setTipsShow((prev) => !prev)}>
               <Button
                 className='order-box3-btn'
                 onClick={() => {
@@ -923,8 +910,7 @@ const OrderPage = () => {
                 }}
                 style={{
                   background: checkText === "Tips" ? "#0076fe" : "#FFF",
-                }}
-              >
+                }}>
                 {checkText === "Tips" ? <Tips color={"#fff"} /> : <Tips color={"#0076fe"} />}
                 <div style={{ color: checkText === "Tips" ? "#FFF" : "#0076fe" }}>Tips</div>
               </Button>
@@ -950,8 +936,7 @@ const OrderType = ({ orderListData }) => {
           style={{
             background: orderListData.orderType === "walk-in" ? "#0076fe" : "#FFF",
             color: orderListData.orderType === "walk-in" ? "#fff" : "#0076fe",
-          }}
-        >
+          }}>
           <Pedestrian color={orderListData.orderType === "walk-in" ? "#fff" : "#0076fe"} />
           <div>Walk In</div>
         </Button>
@@ -965,8 +950,7 @@ const OrderType = ({ orderListData }) => {
           style={{
             background: orderListData.orderType === "Pick Up" ? "#0076fe" : "#FFF",
             color: orderListData.orderType === "Pick Up" ? "#fff" : "#0076fe",
-          }}
-        >
+          }}>
           <BagFull color={orderListData.orderType === "Pick Up" ? "#fff" : "#0076fe"} />
           <div>Pick Up</div>
         </Button>
@@ -979,8 +963,7 @@ const OrderType = ({ orderListData }) => {
             background: orderListData.orderType === "Delivery" ? "#0076fe" : "#FFF",
             color: orderListData.orderType === "Delivery" ? "#fff" : "#0076fe",
           }}
-          onClick={() => {}}
-        >
+          onClick={() => {}}>
           <ElectricCar color={orderListData.orderType === "Delivery" ? "#fff" : "#0076fe"} />
           <div>Delivery</div>
         </Button>
@@ -1004,7 +987,9 @@ const SetTime = ({ setSetTimeShow, setTimeShow, changeOrderTime }) => {
   let newDate = new Date();
 
   const [date, setDate] = useState(
-    `${newDate.getFullYear()}-${newDate.getMonth() + 1 < 10 ? `0${newDate.getMonth() + 1}` : newDate.getMonth() + 1}-${newDate.getDate() < 10 ? `0${newDate.getDate()}` : newDate.getDate()}`
+    `${newDate.getFullYear()}-${newDate.getMonth() + 1 < 10 ? `0${newDate.getMonth() + 1}` : newDate.getMonth() + 1}-${
+      newDate.getDate() < 10 ? `0${newDate.getDate()}` : newDate.getDate()
+    }`
   );
 
   const onPanelChange = (value) => {
@@ -1031,8 +1016,7 @@ const SetTime = ({ setSetTimeShow, setTimeShow, changeOrderTime }) => {
                 let date = new Date();
                 setHour(date.getHours());
                 setMin(date.getMinutes());
-              }}
-            >
+              }}>
               Now Hour Minute
             </Button>
             <Button
@@ -1040,8 +1024,7 @@ const SetTime = ({ setSetTimeShow, setTimeShow, changeOrderTime }) => {
               onClick={() => {
                 setHour("00");
                 setMin("00");
-              }}
-            >
+              }}>
               Clear
             </Button>
           </div>
@@ -1051,22 +1034,19 @@ const SetTime = ({ setSetTimeShow, setTimeShow, changeOrderTime }) => {
               onClick={() => {
                 changeOrderTime(`${date} ${hour}:${min}`);
                 setSetTimeShow(false);
-              }}
-            >
+              }}>
               Save
             </Button>
             <Button
               type='primary'
               onClick={() => {
                 setSetTimeShow(false);
-              }}
-            >
+              }}>
               Quit
             </Button>
           </div>
         </div>,
-      ]}
-    >
+      ]}>
       <Calendar
         fullscreen={false}
         headerRender={({ value, type, onChange, onTypeChange }) => {
@@ -1130,8 +1110,7 @@ const SetTime = ({ setSetTimeShow, setTimeShow, changeOrderTime }) => {
             <div
               style={{
                 paddingBottom: 8,
-              }}
-            >
+              }}>
               <Row gutter={8} justify='space-around' align='middle'>
                 <Col>
                   <Radio.Group size='small' onChange={(e) => onTypeChange(e.target.value)} value={type}>
@@ -1148,8 +1127,7 @@ const SetTime = ({ setSetTimeShow, setTimeShow, changeOrderTime }) => {
                     onChange={(newYear) => {
                       const now = value.clone().year(newYear);
                       onChange(now);
-                    }}
-                  >
+                    }}>
                     {options}
                   </Select>
                 </Col>
@@ -1161,8 +1139,7 @@ const SetTime = ({ setSetTimeShow, setTimeShow, changeOrderTime }) => {
                     onChange={(newMonth) => {
                       const now = value.clone().month(newMonth);
                       onChange(now);
-                    }}
-                  >
+                    }}>
                     {monthOptions}
                   </Select>
                 </Col>
@@ -1174,8 +1151,7 @@ const SetTime = ({ setSetTimeShow, setTimeShow, changeOrderTime }) => {
                     value={hour}
                     onChange={(newHour) => {
                       changeNewHour(newHour);
-                    }}
-                  >
+                    }}>
                     {hourOption}
                   </Select>
                 </Col>
@@ -1186,8 +1162,7 @@ const SetTime = ({ setSetTimeShow, setTimeShow, changeOrderTime }) => {
                     value={min}
                     onChange={(newMin) => {
                       changeMin(newMin);
-                    }}
-                  >
+                    }}>
                     {minOption}
                   </Select>
                 </Col>
@@ -1287,7 +1262,14 @@ const SelfInput = ({ setSelfInputShow, selfInputShow, setOrderListData, setSaveS
   };
 
   return (
-    <Modal title='Self Input' open={selfInputShow} onOk={() => setSelfInputShow(false)} onCancel={() => setSelfInputShow(false)} width={800} footer={null} centered>
+    <Modal
+      title='Self Input'
+      open={selfInputShow}
+      onOk={() => setSelfInputShow(false)}
+      onCancel={() => setSelfInputShow(false)}
+      width={800}
+      footer={null}
+      centered>
       <div className='selfInput'>
         <div className='selfInput-content'>
           <div className='selfInput-content-left'>
@@ -1322,8 +1304,7 @@ const SelfInput = ({ setSelfInputShow, selfInputShow, setOrderListData, setSaveS
                 onClick={() => {
                   setPrice((prev) => (prev = 1));
                   setDistinguish("price");
-                }}
-              >
+                }}>
                 1.00
               </Button>
               <Button
@@ -1332,8 +1313,7 @@ const SelfInput = ({ setSelfInputShow, selfInputShow, setOrderListData, setSaveS
                 onClick={() => {
                   setPrice((prev) => (prev = 2));
                   setDistinguish("price");
-                }}
-              >
+                }}>
                 2.00
               </Button>
             </div>
@@ -1355,8 +1335,7 @@ const SelfInput = ({ setSelfInputShow, selfInputShow, setOrderListData, setSaveS
                 onClick={() => {
                   setPrice((prev) => (prev = 3));
                   setDistinguish("price");
-                }}
-              >
+                }}>
                 3.00
               </Button>
               <Button
@@ -1365,8 +1344,7 @@ const SelfInput = ({ setSelfInputShow, selfInputShow, setOrderListData, setSaveS
                 onClick={() => {
                   setPrice((prev) => (prev = 4));
                   setDistinguish("price");
-                }}
-              >
+                }}>
                 4.00
               </Button>
             </div>
@@ -1407,8 +1385,7 @@ const SelfInput = ({ setSelfInputShow, selfInputShow, setOrderListData, setSaveS
               } else {
                 message.error("请先输入信息再进行保存");
               }
-            }}
-          >
+            }}>
             <Save />
             Save
           </Button>
@@ -1424,8 +1401,7 @@ const SelfInput = ({ setSelfInputShow, selfInputShow, setOrderListData, setSaveS
               setName("");
               setPrice("");
               setQuantitly("");
-            }}
-          >
+            }}>
             <Quit />
             Quit
           </Button>
@@ -1580,8 +1556,7 @@ const DishList = ({ dishShow, touchOK, touchCancel, mock, orderListTemp, setOrde
         <Button key='OK' type='primary' onClick={submit} style={{ fontWeight: "bold" }}>
           ${price.toFixed(2)} - Add to cart
         </Button>,
-      ]}
-    >
+      ]}>
       <div style={{ maxHeight: 400, overflow: "auto" }}>
         {mock.optionsList.map((item, index) => (
           <OptionsList
