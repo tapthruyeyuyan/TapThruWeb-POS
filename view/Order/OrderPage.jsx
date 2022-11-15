@@ -29,11 +29,9 @@ import {
 } from "../../component/Svg/Svg";
 import "./OrderPage.less";
 import ChangePrice from "../../component/Tax/ChangePrice";
-import { useNavigate, useParams } from "react-router-dom";
-import Keyboard from "../../component/Keyboard";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import Notepad from "./commponent/Notepad";
 import { useDispatch, useSelector } from "react-redux";
-import OptionsList from "./commponent/OptionsList";
 import { changeOrderList } from "../../src/store/storeInfoSlice";
 import produce from "immer";
 import OrderType from "./commponent/OrderType";
@@ -68,6 +66,8 @@ const OrderPage = () => {
 
   // 获取当前路径
   const params = useParams();
+
+  const [searchParams] = useSearchParams();
 
   /**
    * @description: 分页
@@ -330,6 +330,24 @@ const OrderPage = () => {
     orderItem: [],
     splitEvent: null,
     averageState: null,
+    information: {
+      phoneNumber: searchParams.get("phone"),
+      ext: searchParams.get("ext"),
+      address: searchParams.get("address"),
+      city: searchParams.get("city"),
+      state: searchParams.get("state"),
+      zip: searchParams.get("zip"),
+      firstName: searchParams.get("firstName"),
+      lastName: searchParams.get("lastName"),
+      location: searchParams.get("location"),
+      remark: searchParams.get("remark"),
+      note: searchParams.get("note"),
+    },
+    groupTable: {
+      groupId: searchParams.get("groupId"),
+      groupName: searchParams.get("groupName"),
+      groupItem: JSON.parse(searchParams.get("groupItem")),
+    },
   });
 
   /**
@@ -733,7 +751,7 @@ const OrderPage = () => {
               style={{ border: "1px solid #FE4A1B" }}
               onClick={() => {
                 if (saveState) {
-                  navigate(-1);
+                  navigate("/pos-mode");
                 } else {
                   confirm({
                     title: "The order has not been saved, whether to continue to exit?",
@@ -752,7 +770,7 @@ const OrderPage = () => {
             </Button>
             <Popover
               placement='leftTop'
-              content={<OrderType orderListData={orderListData} />}
+              content={<OrderType orderListData={orderListData} setOrderListData={setOrderListData} navigate={navigate} />}
               trigger='click'
               open={orderTypeShow}
               onOpenChange={() => setOrderTypeShow((prev) => !prev)}>

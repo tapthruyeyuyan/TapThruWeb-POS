@@ -54,7 +54,7 @@ const Routers = () => {
       component: <OrderPage />,
     },
     {
-      path: "/infomation",
+      path: "/infomation/:type",
       auth: true,
       component: <Information />,
     },
@@ -139,7 +139,12 @@ const Routers = () => {
   const RouteNav = (param) => {
     return param.map((item) => {
       return (
-        <Route path={item.path} element={item.path === pathname && item.auth && JSON.stringify(store) === "{}" ? <Navigate to='/login' replace={true}></Navigate> : item.component} key={item.path}>
+        <Route
+          path={item.path}
+          element={
+            item.path === pathname && item.auth && JSON.stringify(store) === "{}" ? <Navigate to='/login' replace={true}></Navigate> : item.component
+          }
+          key={item.path}>
           {item?.child && RouteNav(item.child)}
         </Route>
       );

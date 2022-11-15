@@ -1,24 +1,15 @@
 /*
  * @Author: tapthruyeyuyan 102268434+tapthruyeyuyan@users.noreply.github.com
  * @Date: 2022-10-31 08:48:34
- * @LastEditors: tapthruyeyuyan 102268434+tapthruyeyuyan@users.noreply.github.com
- * @LastEditTime: 2022-11-01 09:34:21
+ * @LastEditors: error: git config user.name && git config user.email & please set dead value or install git
+ * @LastEditTime: 2022-11-15 15:40:05
  * @FilePath: \TapThruWeb-POS\view\Table\component\TableItem.jsx
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
 import React, { useEffect, useRef, useState } from "react";
 import "./TableItem.less";
 
-const TableItem = ({
-  box,
-  parmas,
-  item,
-  index,
-  setTableId,
-  tableId,
-  setTableIndex,
-  changeTablePosition,
-}) => {
+const TableItem = ({ box, parmas, item, index, setTableId, tableId, setTableIndex, changeTablePosition }) => {
   const move = useRef(null);
 
   /**
@@ -62,7 +53,7 @@ const TableItem = ({
 
   return (
     <div
-      className="tableItem"
+      className='tableItem'
       style={{
         left: item.x,
         top: item.y,
@@ -73,8 +64,11 @@ const TableItem = ({
         if (parmas === "setup") {
           changeMove(e);
         }
-      }}
-    >
+        if (parmas === "buffet" || parmas === "dine-in") {
+          setTableId(item.id);
+          setTableIndex(index);
+        }
+      }}>
       {item.name}
     </div>
   );

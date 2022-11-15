@@ -2,7 +2,24 @@ import { CloseSquareOutlined } from "@ant-design/icons";
 import React, { useEffect } from "react";
 import { useSelector } from "react-redux";
 import "./PSOMode.less";
-import { Rollback, Earth, Pedestrian, DineIn, BagFull, RefuseBin, Map, Car, QRcode, Timer, Landline, ElectricCar, UserSetting, List, Dollar, Wallet } from "../../component/Svg/Svg";
+import {
+  Rollback,
+  Earth,
+  Pedestrian,
+  DineIn,
+  BagFull,
+  RefuseBin,
+  Map,
+  Car,
+  QRcode,
+  Timer,
+  Landline,
+  ElectricCar,
+  UserSetting,
+  List,
+  Dollar,
+  Wallet,
+} from "../../component/Svg/Svg";
 import { Link, useNavigate } from "react-router-dom";
 import { Button, Input } from "antd";
 import { useState } from "react";
@@ -50,13 +67,19 @@ const POSMode = () => {
                 <div>Walk In</div>
               </Button>
             </Link>
-            <Button type='primary' className='home-content-btn' style={{ margin: "0 20px" }}>
+            <Button
+              type='primary'
+              className='home-content-btn'
+              style={{ margin: "0 20px" }}
+              onClick={() => {
+                navigate("/table/dine-in");
+              }}>
               <div>
                 <DineIn />
               </div>
               <div>Dine In</div>
             </Button>
-            <Link to={"/infomation"}>
+            <Link to={"/infomation/pick-up"}>
               <Button type='primary' className='home-content-btn'>
                 <div>
                   <BagFull />
@@ -67,7 +90,7 @@ const POSMode = () => {
           </div>
 
           <div className='home-content'>
-            <Link to={"/infomation"}>
+            <Link to={"/infomation/delivery"}>
               <Button type='primary' className='home-content-btn'>
                 <div>
                   <ElectricCar />
@@ -81,8 +104,7 @@ const POSMode = () => {
               style={{ margin: "0 20px" }}
               onClick={() => {
                 navigate("/table/buffet");
-              }}
-            >
+              }}>
               <div>
                 <UserSetting />
               </div>
@@ -137,8 +159,7 @@ const POSMode = () => {
               style={{ marginLeft: 10 }}
               onClick={() => {
                 navigate("/clock-in");
-              }}
-            >
+              }}>
               <Timer />
               <div style={{ marginLeft: 10 }}>Clock In</div>
             </Button>
@@ -156,8 +177,7 @@ const POSMode = () => {
                 if (pin.length !== 0) {
                   setPin((prev) => prev.slice(0, -1));
                 }
-              }}
-            >
+              }}>
               <RefuseBin />
             </Button>
           </div>
@@ -168,8 +188,7 @@ const POSMode = () => {
                 className='home-box2-keyboard'
                 onClick={() => {
                   setPin((prev) => (prev += "1"));
-                }}
-              >
+                }}>
                 1
               </Button>
               <Button
@@ -177,8 +196,7 @@ const POSMode = () => {
                 className='home-box2-keyboard'
                 onClick={() => {
                   setPin((prev) => (prev += "2"));
-                }}
-              >
+                }}>
                 2
               </Button>
               <Button
@@ -186,8 +204,7 @@ const POSMode = () => {
                 className='home-box2-keyboard'
                 onClick={() => {
                   setPin((prev) => (prev += "3"));
-                }}
-              >
+                }}>
                 3
               </Button>
             </div>
@@ -197,8 +214,7 @@ const POSMode = () => {
                 className='home-box2-keyboard'
                 onClick={() => {
                   setPin((prev) => (prev += "4"));
-                }}
-              >
+                }}>
                 4
               </Button>
               <Button
@@ -206,8 +222,7 @@ const POSMode = () => {
                 className='home-box2-keyboard'
                 onClick={() => {
                   setPin((prev) => (prev += "5"));
-                }}
-              >
+                }}>
                 5
               </Button>
               <Button
@@ -215,8 +230,7 @@ const POSMode = () => {
                 className='home-box2-keyboard'
                 onClick={() => {
                   setPin((prev) => (prev += "6"));
-                }}
-              >
+                }}>
                 6
               </Button>
             </div>
@@ -226,8 +240,7 @@ const POSMode = () => {
                 className='home-box2-keyboard'
                 onClick={() => {
                   setPin((prev) => (prev += "7"));
-                }}
-              >
+                }}>
                 7
               </Button>
               <Button
@@ -235,8 +248,7 @@ const POSMode = () => {
                 className='home-box2-keyboard'
                 onClick={() => {
                   setPin((prev) => (prev += "8"));
-                }}
-              >
+                }}>
                 8
               </Button>
               <Button
@@ -244,8 +256,7 @@ const POSMode = () => {
                 className='home-box2-keyboard'
                 onClick={() => {
                   setPin((prev) => (prev += "9"));
-                }}
-              >
+                }}>
                 9
               </Button>
             </div>
@@ -257,8 +268,7 @@ const POSMode = () => {
                 style={{ flex: 1 }}
                 onClick={() => {
                   setPin((prev) => (prev += "0"));
-                }}
-              >
+                }}>
                 0
               </Button>
               <Button type='primary' className='home-box2-keyboard' style={{ flex: 3 }}>
@@ -287,8 +297,7 @@ const POSMode = () => {
             className='home-box3-btn'
             onClick={() => {
               navigate("/table/setup");
-            }}
-          >
+            }}>
             <div>Setup Table</div>
           </Button>
           <Button
@@ -296,8 +305,7 @@ const POSMode = () => {
             className='home-box3-btn'
             onClick={() => {
               navigate("/configure");
-            }}
-          >
+            }}>
             <div>Configure</div>
           </Button>
           <Button
@@ -305,8 +313,7 @@ const POSMode = () => {
             className='home-box3-btn'
             onClick={() => {
               navigate("/setup-pw");
-            }}
-          >
+            }}>
             <div>Setup PW</div>
           </Button>
           <Button
@@ -314,8 +321,7 @@ const POSMode = () => {
             className='home-box3-btn'
             onClick={() => {
               navigate("/report");
-            }}
-          >
+            }}>
             <div>Report</div>
           </Button>
         </div>

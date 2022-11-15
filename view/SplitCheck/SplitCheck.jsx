@@ -26,11 +26,11 @@ const SplitCheck = () => {
   //   进入页面传入useState
   useEffect(() => {
     reset();
-    if (orderInfo[Number(params.id)].splitEvent !== undefined) {
-      setSelectedList(orderInfo[Number(params.id)].splitEvent);
+    if (orderInfo.filter((item) => item.id === Number(params.id))[0].splitEvent !== undefined) {
+      setSelectedList(orderInfo.filter((item) => item.id === Number(params.id))[0].splitEvent);
     }
-    if (orderInfo[Number(params.id)].averageState !== undefined) {
-      setAverageState(orderInfo[Number(params.id)].averageState);
+    if (orderInfo.filter((item) => item.id === Number(params.id))[0].averageState !== undefined) {
+      setAverageState(orderInfo.filter((item) => item.id === Number(params.id))[0].averageState);
       setOrderData([]);
     }
   }, []);
@@ -167,10 +167,6 @@ const SplitCheck = () => {
     setAverageState(true);
   };
 
-  useEffect(() => {
-    console.log(selectedList);
-  }, [selectedList]);
-
   /**
    * @description: 重置
    * @return {*}
@@ -218,8 +214,7 @@ const SplitCheck = () => {
                 onClick={() => {
                   changeCheckList(index);
                 }}
-                style={{ background: checkListIndex === index && "#FE4A1B", borderColor: checkListIndex === index && "#FE4A1B" }}
-              >
+                style={{ background: checkListIndex === index && "#FE4A1B", borderColor: checkListIndex === index && "#FE4A1B" }}>
                 <div>{`Check${index + 1}`}</div>
                 <div>{Number(temp).toFixed(2)}</div>
               </Button>
@@ -266,8 +261,7 @@ const SplitCheck = () => {
                   onClickCheckList(index);
                 }}
                 style={{ background: bol && "#FE4A1B", borderColor: bol && "#FE4A1B" }}
-                disabled={bols}
-              >
+                disabled={bols}>
                 <div>{item.name}</div>
                 <div>{item.price}</div>
               </Button>
@@ -281,8 +275,7 @@ const SplitCheck = () => {
           className='splitchek-right-btn'
           onClick={() => {
             setSplitChekNumberShow(true);
-          }}
-        >
+          }}>
           <Split color={"#fff"} />
           <div className='splitchek-right-btn-text'>平均分单</div>
         </Button>
@@ -305,8 +298,7 @@ const SplitCheck = () => {
               selected();
             }
           }}
-          disabled={averageState}
-        >
+          disabled={averageState}>
           <Check />
           <div className='splitchek-right-btn-text'>选择</div>
         </Button>
@@ -320,8 +312,7 @@ const SplitCheck = () => {
           onClick={() => {
             save();
           }}
-          disabled={checkListState}
-        >
+          disabled={checkListState}>
           <Save color={"#fff"} />
           <div className='splitchek-right-btn-text'>只保存</div>
         </Button>
@@ -338,8 +329,7 @@ const SplitCheck = () => {
           className='splitchek-right-btn'
           onClick={() => {
             reset();
-          }}
-        >
+          }}>
           <Modify color={"#fff"} />
           <div className='splitchek-right-btn-text'>Reset</div>
         </Button>
@@ -348,8 +338,7 @@ const SplitCheck = () => {
           className='splitchek-right-btn'
           onClick={() => {
             navigate("/pos-mode");
-          }}
-        >
+          }}>
           <Quit />
           <div className='splitchek-right-btn-text' style={{ color: "#FE4A1B" }}>
             退出
@@ -381,8 +370,7 @@ const SplitCheckNumber = ({ splitChekNumberShow, setSplitChekNumberShow, average
         setSplitChekNumberShow(false);
       }}
       centered
-      width={270}
-    >
+      width={270}>
       <ChangePrice type={"splitCheck"} orderNumber={splitCheck} setFun={setSplitCheck} />
     </Modal>
   );

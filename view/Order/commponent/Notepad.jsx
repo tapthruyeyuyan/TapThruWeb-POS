@@ -1,8 +1,8 @@
 /*
  * @Author: tapthruyeyuyan 102268434+tapthruyeyuyan@users.noreply.github.com
  * @Date: 2022-11-01 14:35:01
- * @LastEditors: tapthruyeyuyan 102268434+tapthruyeyuyan@users.noreply.github.com
- * @LastEditTime: 2022-11-07 14:04:13
+ * @LastEditors: error: git config user.name && git config user.email & please set dead value or install git
+ * @LastEditTime: 2022-11-15 16:51:25
  * @FilePath: \TapThruWeb-POS\view\Order\commponent\Notepad.jsx
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -13,11 +13,10 @@ const Notepad = ({ orderListData, notepadList, setNotepadList }) => {
   const [subtotal, setSubtotal] = useState(0);
 
   useEffect(() => {
-    if (orderListData !== undefined) {
+    if (orderListData !== undefined && orderListData.orderItem?.length !== undefined) {
       let temp = 0;
       for (let i = 0; i < orderListData.orderItem.length; i++) {
         temp += orderListData.orderItem[i].price * orderListData.orderItem[i].quantity;
-
         for (let j = 0; j < orderListData.orderItem[i].orderItemsOptions.length; j++) {
           temp += orderListData.orderItem[i].orderItemsOptions[j].price * orderListData.orderItem[i].orderItemsOptions[j].quantity;
         }
@@ -47,8 +46,11 @@ const Notepad = ({ orderListData, notepadList, setNotepadList }) => {
               onClick={() => {
                 setNotepadList(JSON.parse(JSON.stringify([index])));
               }}
-              style={notepadList[0] === index && notepadList[1] === undefined ? { background: "#0076fe", color: "#fff" } : { background: "#FFF", color: "#333" }}
-            >
+              style={
+                notepadList !== undefined && notepadList[0] === index && notepadList[1] === undefined
+                  ? { background: "#0076fe", color: "#fff" }
+                  : { background: "#FFF", color: "#333" }
+              }>
               <div style={{ width: "18%" }}>{item.quantity}</div>
               <div style={{ width: "50%" }}>{item.name}</div>
               <div style={{ width: "30%" }}>{Number(item.price).toFixed(2)}</div>
@@ -60,13 +62,12 @@ const Notepad = ({ orderListData, notepadList, setNotepadList }) => {
                 key={index_.toString()}
                 style={{
                   borderBottom: "1px solid rgb(118,118,118)",
-                  background: notepadList[0] === index && notepadList[1] === index_ ? "#0076fe" : "#fff",
-                  color: notepadList[0] === index && notepadList[1] === index_ ? "#fff" : "rgb(118,118,118)",
+                  background: notepadList !== undefined && notepadList[0] === index && notepadList[1] === index_ ? "#0076fe" : "#fff",
+                  color: notepadList !== undefined && notepadList[0] === index && notepadList[1] === index_ ? "#fff" : "rgb(118,118,118)",
                 }}
                 onClick={() => {
-                  setNotepadList(JSON.parse(JSON.stringify([index, index_])));
-                }}
-              >
+                  if (notepadList !== undefined) setNotepadList(JSON.parse(JSON.stringify([index, index_])));
+                }}>
                 <div style={{ width: "18%" }}>{item_.quantity}</div>
                 <div style={{ width: "50%" }}>{item_.name}</div>
                 <div style={{ width: "30%" }}>{Number(item_.price).toFixed(2)}</div>
@@ -78,23 +79,28 @@ const Notepad = ({ orderListData, notepadList, setNotepadList }) => {
       <div className='order-box2-price'>
         <div className='order-box2-price-item'>
           <div>Subtotal:</div>
-          <div>${Number(subtotal).toFixed(2)}</div>
+          <div>${Number(subtotal)?.toFixed(2)}</div>
         </div>
         <div className='order-box2-price-item'>
           <div>Tax:</div>
-          <div>${Number(subtotal * 0.08).toFixed(2)}</div>
+          <div>${Number(subtotal * 0.08)?.toFixed(2)}</div>
         </div>
         <div className='order-box2-price-item'>
           <div>Discount:</div>
-          <div>${Number(subtotal * orderListData?.discount - subtotal).toFixed(2)}</div>
+          <div>${JSON.stringify(orderListData) === "{}" ? "0.00" : Number(subtotal * orderListData?.discount - subtotal)?.toFixed(2)}</div>
         </div>
         <div className='order-box2-price-item'>
           <div>Tips:</div>
-          <div>${orderListData?.tips.toFixed(2)}</div>
+          <div>${JSON.stringify(orderListData) === "{}" ? "0.00" : orderListData?.tips?.toFixed(2) ? "0.00" : orderListData?.tips?.toFixed(2)}</div>
         </div>
         <div className='order-box2-price-item'>
           <div>Total:</div>
-          <div>${Number(subtotal + subtotal * 0.08 + orderListData?.tips + (subtotal * orderListData?.discount - subtotal)).toFixed(2)}</div>
+          <div>
+            $
+            {JSON.stringify(orderListData) === "{}"
+              ? "0.00"
+              : Number(subtotal + subtotal * 0.08 + orderListData?.tips + (subtotal * orderListData?.discount - subtotal)).toFixed(2)}
+          </div>
         </div>
       </div>
     </>
