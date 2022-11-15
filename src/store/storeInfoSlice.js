@@ -138,6 +138,7 @@ export const storeInfo = createSlice({
       const { id, data, averageState } = payload;
       for (let i = 0; i < state.orderList.length; i++) {
         if (state.orderList[i].id === id) {
+          // console.log(state.orderList[i]);
           state.orderList[i].splitEvent = data;
           state.orderList[i].averageState = averageState;
         }
